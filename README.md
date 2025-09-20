@@ -10,9 +10,10 @@
 
 ## 🚀 Quick Start (60 seconds)
 
-- Install (no zshrc changes)
+- Install (adds ccm function to your shell rc)
 ```bash
 chmod +x install.sh ccm.sh && ./install.sh
+source ~/.zshrc  # reload current shell
 ```
 
 - Configure (env > config)
@@ -25,9 +26,9 @@ ccm config     # open it in your editor
 export DEEPSEEK_API_KEY=sk-...
 ```
 
-- Use (activate in current shell)
+- Use (after install)
 ```bash
-eval "$(ccm env deepseek)"
+ccm deepseek   # or: ccm ds / ccm kimi / ccm qwen / ccm glm / ccm claude / ccm opus
 ccm status
 ```
 
@@ -36,7 +37,7 @@ ccm status
 ./uninstall.sh
 ```
 
-Notes: does not modify ~/.zshrc; secrets are masked in status; recommend chmod 600 ~/.ccm_config
+Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secrets are masked in status. Recommend chmod 600 ~/.ccm_config
 
 ## 🌟 Features
 
@@ -138,59 +139,46 @@ ccm config
 ccm help
 ```
 
-### Activate in current shell (recommended)
+### Official keys are required
 
-Use env subcommand to safely export environment variables without printing secrets in plain text:
-```bash
-# Apply model env exports to current shell
-eval "$(ccm env deepseek)"
-# Verify
-ccm status
-```
+To use a given model, you must provide an official API key either:
+- as an environment variable in your shell session; or
+- in `~/.ccm_config` (the installer created it on first run)
+
+Placeholders like `your-xxx-api-key` or empty values are treated as not configured.
 
 ### Command Shortcuts
 
 ```bash
-./ccm.sh ds           # Short for deepseek
-./ccm.sh s            # Short for claude sonnet  
-./ccm.sh o            # Short for opus
-./ccm.sh st           # Short for status
+ccm ds           # Short for deepseek
+ccm s            # Short for claude sonnet  
+ccm o            # Short for opus
+ccm st           # Short for status
 ```
 
 ### Usage Examples
 
 ```bash
 # Switch to KIMI for long text processing
-$ ./ccm.sh kimi
-🔄 Switching to KIMI2 model...
-✅ Switched to KIMI2 (Official)
-   BASE_URL: https://api.moonshot.cn/v1/anthropic
-   MODEL: moonshot-v1-128k
-
-# Switch to Deepseek for code generation (auto fallback if no official key)
-$ ./ccm.sh deepseek  
-🔄 Switching to Deepseek model...
-✅ Switched to Deepseek (PPINFRA Fallback)
-   BASE_URL: https://api.ppinfra.com/openai/v1/anthropic
-   MODEL: deepseek/deepseek-v3.1
-
-# Check current configuration status
-$ ./ccm.sh status
+ccm kimi
+ccm status
 📊 Current model configuration:
-   BASE_URL: https://api.ppinfra.com/openai/v1/anthropic
+   BASE_URL: https://api.moonshot.cn/v1/anthropic
    AUTH_TOKEN: [Set]
-   MODEL: deepseek/deepseek-v3.1
-   SMALL_MODEL: deepseek/deepseek-v3.1
+   MODEL: moonshot-v1-128k
+   SMALL_MODEL: moonshot-v1-8k
 
-🔧 Environment variable status:
-   GLM_API_KEY: [Not set]
-   KIMI_API_KEY: [Set]
-   DEEPSEEK_API_KEY: [Not set]
-   QWEN_API_KEY: [Not set]
-   PPINFRA_API_KEY: [Set]
+# Switch to Deepseek for code generation
+ccm ds
+ccm status
+📊 Current model configuration:
+   BASE_URL: https://api.deepseek.com/anthropic   # or PPINFRA fallback if official key is missing
+   AUTH_TOKEN: [Set]
+   MODEL: deepseek-chat
+   SMALL_MODEL: deepseek-chat
 ```
 
-## 🛠️ Install (no zshrc changes)
+## 🛠️ Install (adds ccm function to rc)
 
 CCM supports safe one-step installation without modifying your shell configuration files.
 
@@ -201,21 +189,15 @@ chmod +x install.sh ccm.sh
 ./install.sh
 ```
 
-- Installs to /usr/local/bin or /opt/homebrew/bin when writable
-- Falls back to ~/.local/bin if system paths are not writable
-- Does NOT modify ~/.zshrc or other shell profiles
+- Writes a `ccm()` function block into your rc (zsh preferred, bash fallback)
+- Does NOT copy binaries or modify PATH
+- Idempotent: re-running install replaces the previous block
 
 ### Uninstall
 ```bash
 ./uninstall.sh
 ```
 
-If installed to a protected directory, you may need sudo:
-```bash
-sudo install -m 0755 ./ccm.sh /usr/local/bin/ccm
-# To uninstall
-sudo rm -f /usr/local/bin/ccm
-```
 
 ## 🔧 Advanced Configuration
 
@@ -254,7 +236,7 @@ CCM implements intelligent fallback mechanism:
 
 ### Security and Privacy
 - Status output masks secrets (shows only first/last 4 chars)
-- env subcommand prints only export statements and references to variables; it does not echo secrets
+- ccm sets only `ANTHROPIC_AUTH_TOKEN` (not `ANTHROPIC_API_KEY`), plus base URL and model variables
 - Configuration file precedence: Environment Variables > ~/.ccm_config
 - Recommended file permission: `chmod 600 ~/.ccm_config`
 
@@ -301,7 +283,7 @@ A: Check if the corresponding API key is correctly configured in ~/.ccm_config
 **Q: Claude Code doesn't work after switching**
 ```bash
 A: Confirm environment variables are set correctly:
-   ./ccm.sh status  # Check current configuration status
+   ccm status  # Check current configuration status
    echo $ANTHROPIC_BASE_URL  # Check environment variable
 ```
 
@@ -314,13 +296,16 @@ A: Configure the corresponding official API key, script will automatically prior
 
 ```bash
 # Show detailed status information
-./ccm.sh status
+ccm status
 
 # Check configuration file
 cat ~/.ccm_config
 
 # Verify environment variables
 env | grep ANTHROPIC
+
+# If you see an auth conflict about API_KEY vs AUTH_TOKEN
+unset ANTHROPIC_API_KEY   # ccm only sets ANTHROPIC_AUTH_TOKEN
 ```
 
 ## 🤝 Contributing

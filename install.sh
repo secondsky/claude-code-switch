@@ -1,61 +1,90 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Simple installer for Claude Code Model Switcher (CCM)
-# - Installs ccm to a safe, standard path
-# - Does NOT modify your shell rc files (e.g., ~/.zshrc)
-# - Falls back to ~/.local/bin if system paths are not writable
+# Installer for Claude Code Model Switcher (CCM)
+# - Writes a ccm() function into your shell rc so that `ccm kimi` works directly
+# - Does NOT rely on modifying PATH or copying binaries
+# - Idempotent: will replace previous CCM function block if exists
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC="$SCRIPT_DIR/ccm.sh"
-TARGET_NAME="ccm"
+SCRIPT_PATH="$SCRIPT_DIR/ccm.sh"
+BEGIN_MARK="# >>> ccm function begin >>>"
+END_MARK="# <<< ccm function end <<<"
 
-choose_prefix() {
-  local candidates=("/usr/local/bin" "/opt/homebrew/bin" "$HOME/.local/bin")
-  for d in "${candidates[@]}"; do
-    if [[ -d "$d" && -w "$d" ]]; then
-      echo "$d"
-      return 0
-    fi
-  done
-  # Create ~/.local/bin if needed
-  mkdir -p "$HOME/.local/bin"
-  echo "$HOME/.local/bin"
+# Detect which rc file to modify (prefer zsh)
+detect_rc_file() {
+  local shell_name
+  shell_name="${SHELL##*/}"
+  case "$shell_name" in
+    zsh)
+      echo "$HOME/.zshrc"
+      ;;
+    bash)
+      echo "$HOME/.bashrc"
+      ;;
+    *)
+      # Fallback to zshrc
+      echo "$HOME/.zshrc"
+      ;;
+  esac
+}
+
+remove_existing_block() {
+  local rc="$1"
+  [[ -f "$rc" ]] || return 0
+  if grep -qF "$BEGIN_MARK" "$rc"; then
+    # Remove the existing block between markers (inclusive)
+    local tmp
+    tmp="$(mktemp)"
+    awk -v b="$BEGIN_MARK" -v e="$END_MARK" '
+      $0==b {inblock=1; next}
+      $0==e {inblock=0; next}
+      !inblock {print}
+    ' "$rc" > "$tmp" && mv "$tmp" "$rc"
+  fi
+}
+
+append_function_block() {
+  local rc="$1"
+  mkdir -p "$(dirname "$rc")"
+  [[ -f "$rc" ]] || touch "$rc"
+  cat >> "$rc" <<EOF
+$BEGIN_MARK
+# CCM: define a shell function that applies exports to current shell
+ccm() {
+  local script="$SCRIPT_PATH"
+  if [[ ! -f "\$script" ]]; then
+    echo "ccm error: script not found at \$script" >&2
+    return 1
+  fi
+  case "\$1" in
+    ""|"help"|"-h"|"--help"|"status"|"st"|"config"|"cfg")
+      "\$script" "\$@"
+      ;;
+    *)
+      eval "\$("\$script" "\$@")"
+      ;;
+  esac
+}
+$END_MARK
+EOF
 }
 
 main() {
-  if [[ ! -f "$SRC" ]]; then
-    echo "Error: ccm.sh not found next to install.sh: $SRC" >&2
+  if [[ ! -f "$SCRIPT_PATH" ]]; then
+    echo "Error: ccm.sh not found next to install.sh: $SCRIPT_PATH" >&2
     exit 1
   fi
+  chmod +x "$SCRIPT_PATH"
 
-  chmod +x "$SRC"
+  local rc
+  rc="$(detect_rc_file)"
+  remove_existing_block "$rc"
+  append_function_block "$rc"
 
-  local prefix
-  prefix=$(choose_prefix)
-  local dest="$prefix/$TARGET_NAME"
-
-  # Try to copy
-  if cp "$SRC" "$dest" 2>/dev/null; then
-    chmod 0755 "$dest" || true
-    echo "✅ Installed: $dest"
-  else
-    echo "⚠️  No permission to write $dest. Try running with sudo:"
-    echo "   sudo install -m 0755 '$SRC' '$dest'"
-    exit 1
-  fi
-
-  # Guidance for PATH if using ~/.local/bin
-  if [[ "$prefix" == "$HOME/.local/bin" ]]; then
-    echo ""
-    echo "ℹ️  $prefix was used. If not already in PATH, add it to your shell rc:"
-    echo "   echo 'export PATH=\$PATH:$HOME/.local/bin' >> ~/.zshrc && source ~/.zshrc"
-  fi
-
-  echo ""
-  echo "Next steps:"
-  echo "  - Ensure ~/.ccm_config exists: run 'ccm' once or edit via 'ccm config'"
-  echo "  - To activate in current shell: eval \"$(ccm env deepseek)\" (example)"
+  echo "✅ Installed ccm function into: $rc"
+  echo "   Reload your shell or run: source $rc"
+  echo "   Then use: ccm kimi  (or: ccm ds / ccm qwen / ccm glm / ccm claude / ccm opus)"
 }
 
 main "$@"
