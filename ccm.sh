@@ -36,6 +36,9 @@ GLM_API_KEY=your-glm-api-key
 # KIMI2 (月之暗面)
 KIMI_API_KEY=your-kimi-api-key
 
+# LongCat（美团）
+LONGCAT_API_KEY=your-longcat-api-key
+
 # Qwen（如使用官方 Anthropic 兼容网关）
 QWEN_API_KEY=your-qwen-api-key
 # 可选：如果使用官方 Qwen 的 Anthropic 兼容端点，请在此填写
@@ -54,18 +57,28 @@ EOF
     
     # 智能加载：只有环境变量未设置的键才从配置文件读取
     local temp_file=$(mktemp)
-    while IFS='=' read -r key value; do
+    while IFS= read -r raw; do
+        # 去掉回车、去掉行内注释并修剪两端空白
+        raw=${raw%$'\r'}
         # 跳过注释和空行
-        [[ "$key" =~ ^[[:space:]]*# ]] && continue
-        [[ -z "$key" ]] && continue
+        [[ "$raw" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "$raw" ]] && continue
+        # 删除行内注释（从第一个 # 起）
+        local line="${raw%%#*}"
+        # 去掉首尾空白
+        line=$(echo "$line" | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//')
+        [[ -z "$line" ]] && continue
         
-        # 移除前导空格
-        key=$(echo "$key" | sed 's/^[[:space:]]*//')
-        value=$(echo "$value" | sed 's/^[[:space:]]*//')
-        
-        # 只在环境变量未设置时才设置
-        if [[ -n "$key" && -z "${!key}" ]]; then
-            echo "export $key='$value'" >> "$temp_file"
+        # 解析 export KEY=VALUE 或 KEY=VALUE
+        if [[ "$line" =~ ^[[:space:]]*(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=(.*)$ ]]; then
+            local key="${BASH_REMATCH[2]}"
+            local value="${BASH_REMATCH[3]}"
+            # 去掉首尾空白
+            value=$(echo "$value" | sed -E 's/^[[:space:]]*//; s/[[:space:]]*$//')
+            # 仅当环境未设置时才应用
+            if [[ -n "$key" && -z "${!key}" ]]; then
+                echo "export $key=$value" >> "$temp_file"
+            fi
         fi
     done < "$CONFIG_FILE"
     
@@ -91,6 +104,9 @@ GLM_API_KEY=your-glm-api-key
 
 # KIMI2 (月之暗面)
 KIMI_API_KEY=your-kimi-api-key
+
+# LongCat（美团）
+LONGCAT_API_KEY=your-longcat-api-key
 
 # Qwen（如使用官方 Anthropic 兼容网关）
 QWEN_API_KEY=your-qwen-api-key
@@ -162,6 +178,7 @@ show_status() {
     echo -e "${BLUE}🔧 环境变量状态:${NC}"
     echo "   GLM_API_KEY: $(mask_presence GLM_API_KEY)"
     echo "   KIMI_API_KEY: $(mask_presence KIMI_API_KEY)"
+    echo "   LONGCAT_API_KEY: $(mask_presence LONGCAT_API_KEY)"
     echo "   DEEPSEEK_API_KEY: $(mask_presence DEEPSEEK_API_KEY)"
     echo "   QWEN_API_KEY: $(mask_presence QWEN_API_KEY)"
     echo "   PPINFRA_API_KEY: $(mask_presence PPINFRA_API_KEY)"
@@ -322,6 +339,7 @@ show_help() {
     echo -e "${YELLOW}模型选项（与 env 等价，输出 export 语句，便于 eval）:${NC}"
     echo "  deepseek, ds       - 等同于: env deepseek"
     echo "  kimi, kimi2        - 等同于: env kimi"
+    echo "  longcat, lc        - 等同于: env longcat"
     echo "  qwen               - 等同于: env qwen"
     echo "  glm, glm4          - 等同于: env glm"
     echo "  claude, sonnet, s  - 等同于: env claude"
@@ -340,6 +358,7 @@ show_help() {
     echo -e "${YELLOW}支持的模型:${NC}"
     echo "  🌙 KIMI2               - 官方：moonshot-v1-128k ｜ 备用：moonshotai/kimi-k2-0905 (PPINFRA)"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
+    echo "  🐱 LongCat             - 官方：LongCat-Flash-Chat"
     echo "  🐪 Qwen                - 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
     echo "  🇨🇳 GLM4.5             - 官方：glm-4-plus / glm-4-flash"
     echo "  🧠 Claude Sonnet 4     - claude-sonnet-4-20250514"
@@ -506,6 +525,26 @@ emit_env_exports() {
             echo "export ANTHROPIC_MODEL='claude-opus-4-1-20250805'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='claude-sonnet-4-20250514'"
             ;;
+        "longcat")
+            if ! is_effectively_set "$LONGCAT_API_KEY"; then
+                # 兜底：直接 source 配置文件一次（修复某些行格式导致的加载失败）
+                if [ -f "$HOME/.ccm_config" ]; then . "$HOME/.ccm_config" >/dev/null 2>&1; fi
+            fi
+            if is_effectively_set "$LONGCAT_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.longcat.chat/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.longcat.chat/anthropic'"
+                echo "if [ -z \"\${LONGCAT_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${LONGCAT_API_KEY}\""
+                echo "export ANTHROPIC_MODEL='LongCat-Flash-Chat'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='LongCat-Flash-Chat'"
+            else
+                echo "# ❌ 未检测到 LONGCAT_API_KEY" 1>&2
+                return 1
+            fi
+            ;;
         *)
             echo "# 用法: $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus]" 1>&2
             return 1
@@ -531,6 +570,9 @@ main() {
             ;;
         "qwen")
             emit_env_exports qwen
+            ;;
+        "longcat"|"lc")
+            emit_env_exports longcat
             ;;
         "glm"|"glm4"|"glm4.5")
             emit_env_exports glm

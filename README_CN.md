@@ -21,6 +21,7 @@ ccm config     # 打开编辑
 
 # 方式B：设置环境变量（优先级最高）
 export DEEPSEEK_API_KEY=sk-...
+export LONGCAT_API_KEY=your-longcat-api-key
 ```
 
 - 使用（当前 shell 生效）
@@ -51,6 +52,7 @@ ccm status
 |------|---------|------------------|------|
 | 🌙 **KIMI2** | ✅ moonshot-v1-128k | ✅ moonshotai/kimi-k2-0905 | 长文本处理 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
+| 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🐪 **Qwen** | ⚠️ 需配置端点 | ✅ qwen3-next-80b-a3b-thinking | 思考模型 |
 | 🇨🇳 **GLM4.5** | ✅ glm-4-plus | ❌ 仅官方 | 智谱清言 |
 | 🧠 **Claude Sonnet 4** | ✅ claude-sonnet-4-20250514 | ❌ 仅官方 | 平衡性能 |
@@ -90,6 +92,7 @@ CCM 采用智能的配置层次结构：
 # 方式1：设置环境变量（推荐，安全性更好）
 export DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 export KIMI_API_KEY=your-kimi-api-key
+export LONGCAT_API_KEY=your-longcat-api-key
 export PPINFRA_API_KEY=your-ppinfra-api-key
 
 # 方式2：编辑配置文件
@@ -105,6 +108,7 @@ export PPINFRA_API_KEY=your-ppinfra-api-key
 # 官方API密钥
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 KIMI_API_KEY=your-kimi-api-key
+LONGCAT_API_KEY=your-longcat-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key
 QWEN_ANTHROPIC_BASE_URL=https://your-qwen-anthropic-gateway
@@ -123,6 +127,7 @@ ccm kimi          # 切换到KIMI2
 ccm deepseek      # 切换到Deepseek  
 ccm qwen          # 切换到Qwen
 ccm glm           # 切换到GLM4.5
+ccm longcat       # 切换到LongCat
 ccm claude        # 切换到Claude Sonnet 4
 ccm opus          # 切换到Claude Opus 4.1
 

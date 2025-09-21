@@ -54,6 +54,7 @@ Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secret
 |-------|------------------|---------------------------|----------|
 | 🌙 **KIMI2** | ✅ moonshot-v1-128k | ✅ moonshotai/kimi-k2-0905 | Long text processing |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | Cost-effective reasoning |
+| 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🐪 **Qwen** | ⚠️ Requires endpoint config | ✅ qwen3-next-80b-a3b-thinking | Thinking model |
 | 🇨🇳 **GLM4.5** | ✅ glm-4-plus | ❌ Official only | Zhipu AI |
 | 🧠 **Claude Sonnet 4** | ✅ claude-sonnet-4-20250514 | ❌ Official only | Balanced performance |
@@ -93,6 +94,7 @@ CCM follows a smart configuration hierarchy:
 # Option 1: Set environment variables (recommended for security)
 export DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 export KIMI_API_KEY=your-kimi-api-key
+export LONGCAT_API_KEY=your-longcat-api-key
 export PPINFRA_API_KEY=your-ppinfra-api-key
 
 # Option 2: Edit configuration file
@@ -108,6 +110,7 @@ Configuration file example:
 # Official API keys
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 KIMI_API_KEY=your-kimi-api-key
+LONGCAT_API_KEY=your-longcat-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key
 QWEN_ANTHROPIC_BASE_URL=https://your-qwen-anthropic-gateway
@@ -126,6 +129,7 @@ ccm kimi          # Switch to KIMI2
 ccm deepseek      # Switch to Deepseek  
 ccm qwen          # Switch to Qwen
 ccm glm           # Switch to GLM4.5
+ccm longcat       # Switch to LongCat
 ccm claude        # Switch to Claude Sonnet 4
 ccm opus          # Switch to Claude Opus 4.1
 
