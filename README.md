@@ -115,6 +115,22 @@ GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key
 QWEN_ANTHROPIC_BASE_URL=https://your-qwen-anthropic-gateway
 
+# Optional: override model IDs (if omitted, defaults are used)
+DEEPSEEK_MODEL=deepseek-chat
+DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
+KIMI_MODEL=kimi-k2-0905-preview
+KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
+LONGCAT_MODEL=LongCat-Flash-Thinking
+LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
+QWEN_MODEL=qwen3-next-80b-a3b-thinking
+QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking
+GLM_MODEL=glm-4.5
+GLM_SMALL_FAST_MODEL=glm-4.5-air
+CLAUDE_MODEL=claude-sonnet-4-20250514
+CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+OPUS_MODEL=claude-opus-4-1-20250805
+OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+
 # Fallback service (only enabled when official keys are missing)
 PPINFRA_API_KEY=your-ppinfra-api-key
 ```
@@ -143,12 +159,14 @@ ccm config
 ccm help
 ```
 
-### Official keys are required
+### Official keys are required (and model IDs are configurable)
 
 To use a given model, you must provide an official API key either:
 - as an environment variable in your shell session; or
 - in `~/.ccm_config` (the installer created it on first run)
 
+You may also override the default model IDs in `~/.ccm_config` using per-provider variables
+(e.g., `DEEPSEEK_MODEL`, `KIMI_MODEL`, `LONGCAT_MODEL`, etc.). If omitted, sensible defaults are used.
 Placeholders like `your-xxx-api-key` or empty values are treated as not configured.
 
 ### Command Shortcuts
@@ -169,8 +187,8 @@ ccm status
 📊 Current model configuration:
    BASE_URL: https://api.moonshot.cn/v1/anthropic
    AUTH_TOKEN: [Set]
-   MODEL: moonshot-v1-128k
-   SMALL_MODEL: moonshot-v1-8k
+   MODEL: kimi-k2-0905-preview
+   SMALL_MODEL: kimi-k2-0905-preview
 
 # Switch to Deepseek for code generation
 ccm ds

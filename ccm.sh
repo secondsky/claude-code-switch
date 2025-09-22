@@ -47,6 +47,22 @@ QWEN_ANTHROPIC_BASE_URL=
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
 
+# —— 可选：模型ID覆盖（不设置则使用下方默认）——
+DEEPSEEK_MODEL=deepseek-chat
+DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
+KIMI_MODEL=kimi-k2-0905-preview
+KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
+QWEN_MODEL=qwen3-next-80b-a3b-thinking
+QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking
+GLM_MODEL=glm-4.5
+GLM_SMALL_FAST_MODEL=glm-4.5-air
+CLAUDE_MODEL=claude-sonnet-4-20250514
+CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+OPUS_MODEL=claude-opus-4-1-20250805
+OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+LONGCAT_MODEL=LongCat-Flash-Thinking
+LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
+
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key  # https://api.ppinfra.com/openai/v1/anthropic
 EOF
@@ -57,7 +73,7 @@ EOF
     
     # 智能加载：只有环境变量未设置的键才从配置文件读取
     local temp_file=$(mktemp)
-    while IFS= read -r raw; do
+    while IFS='=' read -r key value; do
         # 去掉回车、去掉行内注释并修剪两端空白
         raw=${raw%$'\r'}
         # 跳过注释和空行
@@ -115,6 +131,22 @@ QWEN_ANTHROPIC_BASE_URL=
 
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
+
+# —— 可选：模型ID覆盖（不设置则使用下方默认）——
+DEEPSEEK_MODEL=deepseek-chat
+DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
+KIMI_MODEL=kimi-k2-0905-preview
+KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
+QWEN_MODEL=qwen3-next-80b-a3b-thinking
+QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking
+GLM_MODEL=glm-4.5
+GLM_SMALL_FAST_MODEL=glm-4.5-air
+CLAUDE_MODEL=claude-sonnet-4-20250514
+CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+OPUS_MODEL=claude-opus-4-1-20250805
+OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+LONGCAT_MODEL=LongCat-Flash-Thinking
+LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key  # https://api.ppinfra.com/openai/v1/anthropic
@@ -356,13 +388,48 @@ show_help() {
     echo "  $(basename "$0") status                      # 查看当前状态（脱敏）"
     echo ""
     echo -e "${YELLOW}支持的模型:${NC}"
-    echo "  🌙 KIMI2               - 官方：moonshot-v1-128k ｜ 备用：moonshotai/kimi-k2-0905 (PPINFRA)"
+    echo "  🌙 KIMI2               - 官方：kimi-k2-0905-preview"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
-    echo "  🐱 LongCat             - 官方：LongCat-Flash-Chat"
+echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
     echo "  🐪 Qwen                - 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
-    echo "  🇨🇳 GLM4.5             - 官方：glm-4-plus / glm-4-flash"
+    echo "  🇨🇳 GLM4.5             - 官方：glm-4.5 / glm-4.5-air"
     echo "  🧠 Claude Sonnet 4     - claude-sonnet-4-20250514"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
+}
+
+# 将缺失的模型ID覆盖项追加到配置文件（仅追加缺失项，不覆盖已存在的配置）
+ensure_model_override_defaults() {
+    local -a pairs=(
+        "DEEPSEEK_MODEL=deepseek-chat"
+        "DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat"
+"KIMI_MODEL=kimi-k2-0905-preview"
+        "KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview"
+"LONGCAT_MODEL=LongCat-Flash-Thinking"
+        "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
+        "QWEN_MODEL=qwen3-next-80b-a3b-thinking"
+        "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking"
+"GLM_MODEL=glm-4.5"
+        "GLM_SMALL_FAST_MODEL=glm-4.5-air"
+        "CLAUDE_MODEL=claude-sonnet-4-20250514"
+        "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514"
+        "OPUS_MODEL=claude-opus-4-1-20250805"
+        "OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514"
+    )
+    local added_header=0
+    for pair in "${pairs[@]}"; do
+        local key="${pair%%=*}"
+        local default="${pair#*=}"
+        if ! grep -Eq "^[[:space:]]*(export[[:space:]]+)?${key}[[:space:]]*=" "$CONFIG_FILE" 2>/dev/null; then
+            if [[ $added_header -eq 0 ]]; then
+                {
+                    echo ""
+                    echo "# ---- CCM model ID overrides (auto-added) ----"
+                } >> "$CONFIG_FILE"
+                added_header=1
+            fi
+            printf "%s=%s\n" "$key" "$default" >> "$CONFIG_FILE"
+        fi
+    done
 }
 
 # 编辑配置文件
@@ -372,6 +439,9 @@ edit_config() {
         echo -e "${YELLOW}📝 配置文件不存在，正在创建: $CONFIG_FILE${NC}"
         create_default_config
     fi
+
+    # 追加缺失的模型ID覆盖默认值（不触碰已有键）
+    ensure_model_override_defaults
     
     echo -e "${BLUE}🔧 打开配置文件进行编辑...${NC}"
     echo -e "${YELLOW}配置文件路径: $CONFIG_FILE${NC}"
@@ -423,8 +493,10 @@ emit_env_exports() {
                 echo "# 如果环境变量中未设置，将从 ~/.ccm_config 读取"
                 echo "if [ -z \"\${DEEPSEEK_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${DEEPSEEK_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='deepseek-chat'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='deepseek-chat'"
+                local ds_model="${DEEPSEEK_MODEL:-deepseek-chat}"
+                local ds_small="${DEEPSEEK_SMALL_FAST_MODEL:-deepseek-chat}"
+                echo "export ANTHROPIC_MODEL='${ds_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
@@ -433,8 +505,10 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/openai/v1/anthropic'"
                 echo "if [ -z \"\${PPINFRA_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='deepseek/deepseek-v3.1'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='deepseek/deepseek-v3.1'"
+                local ds_model="${DEEPSEEK_MODEL:-deepseek/deepseek-v3.1}"
+                local ds_small="${DEEPSEEK_SMALL_FAST_MODEL:-deepseek/deepseek-v3.1}"
+                echo "export ANTHROPIC_MODEL='${ds_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
             else
                 echo "# ❌ 未检测到 DEEPSEEK_API_KEY 或 PPINFRA_API_KEY" 1>&2
                 return 1
@@ -449,8 +523,10 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.moonshot.cn/v1/anthropic'"
                 echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${KIMI_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='moonshot-v1-128k'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='moonshot-v1-8k'"
+local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
+                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-0905-preview}"
+                echo "export ANTHROPIC_MODEL='${kimi_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
@@ -459,8 +535,10 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/openai/v1/anthropic'"
                 echo "if [ -z \"\${PPINFRA_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='moonshotai/kimi-k2-0905'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='moonshotai/kimi-k2-0905'"
+local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
+                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-0905-preview}"
+                echo "export ANTHROPIC_MODEL='${kimi_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             else
                 echo "# ❌ 未检测到 KIMI_API_KEY 或 PPINFRA_API_KEY" 1>&2
                 return 1
@@ -475,8 +553,10 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='${QWEN_ANTHROPIC_BASE_URL}'"
                 echo "if [ -z \"\${QWEN_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${QWEN_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='qwen3-next-80b-a3b-thinking'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='qwen3-next-80b-a3b-thinking'"
+                local qwen_model="${QWEN_MODEL:-qwen3-next-80b-a3b-thinking}"
+                local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-thinking}"
+                echo "export ANTHROPIC_MODEL='${qwen_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
@@ -485,8 +565,10 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/openai/v1/anthropic'"
                 echo "if [ -z \"\${PPINFRA_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='qwen3-next-80b-a3b-thinking'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='qwen3-next-80b-a3b-thinking'"
+                local qwen_model="${QWEN_MODEL:-qwen3-next-80b-a3b-thinking}"
+                local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-thinking}"
+                echo "export ANTHROPIC_MODEL='${qwen_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
             else
                 echo "# ❌ 未检测到 QWEN_API_KEY / QWEN_ANTHROPIC_BASE_URL 或 PPINFRA_API_KEY" 1>&2
                 return 1
@@ -497,12 +579,14 @@ emit_env_exports() {
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://open.bigmodel.cn/api/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/anthropic'"
+                echo "export ANTHROPIC_BASE_URL='https://open.bigmodel.cn/api/paas/v4/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/paas/v4/anthropic'"
                 echo "if [ -z \"\${GLM_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${GLM_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='glm-4.5'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='glm-4.5'"
+local glm_model="${GLM_MODEL:-glm-4.5}"
+                local glm_small="${GLM_SMALL_FAST_MODEL:-glm-4.5-air}"
+                echo "export ANTHROPIC_MODEL='${glm_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${glm_small}'"
             else
                 echo "# ❌ GLM 仅支持官方密钥，请设置 GLM_API_KEY" 1>&2
                 return 1
@@ -514,16 +598,20 @@ emit_env_exports() {
             echo "unset ANTHROPIC_BASE_URL"
             echo "unset ANTHROPIC_API_URL"
             echo "unset ANTHROPIC_API_KEY"
-            echo "export ANTHROPIC_MODEL='claude-sonnet-4-20250514'"
-            echo "export ANTHROPIC_SMALL_FAST_MODEL='claude-sonnet-4-20250514'"
+            local claude_model="${CLAUDE_MODEL:-claude-sonnet-4-20250514}"
+            local claude_small="${CLAUDE_SMALL_FAST_MODEL:-claude-sonnet-4-20250514}"
+            echo "export ANTHROPIC_MODEL='${claude_model}'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='${claude_small}'"
             ;;
         "opus"|"o")
             echo "$prelude"
             echo "unset ANTHROPIC_BASE_URL"
             echo "unset ANTHROPIC_API_URL"
             echo "unset ANTHROPIC_API_KEY"
-            echo "export ANTHROPIC_MODEL='claude-opus-4-1-20250805'"
-            echo "export ANTHROPIC_SMALL_FAST_MODEL='claude-sonnet-4-20250514'"
+            local opus_model="${OPUS_MODEL:-claude-opus-4-1-20250805}"
+            local opus_small="${OPUS_SMALL_FAST_MODEL:-claude-sonnet-4-20250514}"
+            echo "export ANTHROPIC_MODEL='${opus_model}'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='${opus_small}'"
             ;;
         "longcat")
             if ! is_effectively_set "$LONGCAT_API_KEY"; then
@@ -538,8 +626,10 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.longcat.chat/anthropic'"
                 echo "if [ -z \"\${LONGCAT_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${LONGCAT_API_KEY}\""
-                echo "export ANTHROPIC_MODEL='LongCat-Flash-Chat'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='LongCat-Flash-Chat'"
+local lc_model="${LONGCAT_MODEL:-LongCat-Flash-Thinking}"
+                local lc_small="${LONGCAT_SMALL_FAST_MODEL:-LongCat-Flash-Chat}"
+                echo "export ANTHROPIC_MODEL='${lc_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${lc_small}'"
             else
                 echo "# ❌ 未检测到 LONGCAT_API_KEY" 1>&2
                 return 1

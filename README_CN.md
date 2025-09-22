@@ -168,7 +168,7 @@ $ ./ccm.sh kimi
 🔄 切换到 KIMI2 模型...
 ✅ 已切换到 KIMI2（官方）
    BASE_URL: https://api.moonshot.cn/v1/anthropic
-   MODEL: moonshot-v1-128k
+   MODEL: kimi-k2-0905-preview
 
 # 切换到Deepseek进行代码生成（如果没有官方key，自动使用备用）
 $ ./ccm.sh deepseek  
