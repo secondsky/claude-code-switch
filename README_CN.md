@@ -53,7 +53,7 @@ ccm status
 | 🌙 **KIMI2** | ✅ moonshot-v1-128k | ✅ moonshotai/kimi-k2-0905 | 长文本处理 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
-| 🐪 **Qwen** | ⚠️ 需配置端点 | ✅ qwen3-next-80b-a3b-thinking | 思考模型 |
+| 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.5** | ✅ glm-4-plus | ❌ 仅官方 | 智谱清言 |
 | 🧠 **Claude Sonnet 4** | ✅ claude-sonnet-4-20250514 | ❌ 仅官方 | 平衡性能 |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
@@ -93,6 +93,7 @@ CCM 采用智能的配置层次结构：
 export DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 export KIMI_API_KEY=your-kimi-api-key
 export LONGCAT_API_KEY=your-longcat-api-key
+export QWEN_API_KEY=sk-your-qwen-api-key
 export PPINFRA_API_KEY=your-ppinfra-api-key
 
 # 方式2：编辑配置文件
@@ -110,8 +111,7 @@ DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 KIMI_API_KEY=your-kimi-api-key
 LONGCAT_API_KEY=your-longcat-api-key
 GLM_API_KEY=your-glm-api-key
-QWEN_API_KEY=your-qwen-api-key
-QWEN_ANTHROPIC_BASE_URL=https://your-qwen-anthropic-gateway
+QWEN_API_KEY=your-qwen-api-key  # 阿里云 DashScope
 
 # 备用服务（仅当官方密钥缺失时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
