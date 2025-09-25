@@ -48,6 +48,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Troubleshooting section with common issues
 - MIT License for open source distribution
 
+## [1.1.0] - 2025-09-25
+
+### Changed
+- 🔄 **Qwen Integration Update**: Migrated to Alibaba Cloud DashScope official endpoint
+  - Updated base URL to `https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy`
+  - Changed default model from `qwen-max` to `qwen3-max`
+  - Updated small model from `qwen-max` to `qwen3-next-80b-a3b-instruct`
+  - Removed dependency on custom `QWEN_ANTHROPIC_BASE_URL` configuration
+  - Simplified configuration using standard `sk-` prefixed API keys
+
+### Updated
+- 📝 Configuration templates now use latest Qwen model identifiers
+- 🛠️ Help text updated to reflect new Qwen capabilities
+- 🔧 Maintained backward compatibility with PPINFRA fallback service
+
+### Security
+- 🔒 Ensured no API keys are committed to repository
+- 📋 Removed temporary documentation files containing sensitive information
+
 ## [Unreleased]
 
 ### Planned

@@ -39,10 +39,8 @@ KIMI_API_KEY=your-kimi-api-key
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
 
-# Qwen（如使用官方 Anthropic 兼容网关）
+# Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
-# 可选：如果使用官方 Qwen 的 Anthropic 兼容端点，请在此填写
-QWEN_ANTHROPIC_BASE_URL=
 
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
@@ -52,8 +50,8 @@ DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
 KIMI_MODEL=kimi-k2-0905-preview
 KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
-QWEN_MODEL=qwen3-next-80b-a3b-thinking
-QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking
+QWEN_MODEL=qwen3-max
+QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
 GLM_MODEL=glm-4.5
 GLM_SMALL_FAST_MODEL=glm-4.5-air
 CLAUDE_MODEL=claude-sonnet-4-20250514
@@ -124,10 +122,8 @@ KIMI_API_KEY=your-kimi-api-key
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
 
-# Qwen（如使用官方 Anthropic 兼容网关）
+# Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
-# 可选：如果使用官方 Qwen 的 Anthropic 兼容端点，请在此填写
-QWEN_ANTHROPIC_BASE_URL=
 
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
@@ -137,8 +133,8 @@ DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
 KIMI_MODEL=kimi-k2-0905-preview
 KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
-QWEN_MODEL=qwen3-next-80b-a3b-thinking
-QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking
+QWEN_MODEL=qwen3-max
+QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
 GLM_MODEL=glm-4.5
 GLM_SMALL_FAST_MODEL=glm-4.5-air
 CLAUDE_MODEL=claude-sonnet-4-20250514
@@ -332,19 +328,22 @@ switch_to_kimi() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
-# 切换到 Qwen（官方优先，缺省走 PPINFRA）
+# 切换到 Qwen（阿里云官方优先，缺省走 PPINFRA）
 switch_to_qwen() {
     echo -e "${YELLOW}🔄 切换到 Qwen 模型...${NC}"
     clean_env
-    if is_effectively_set "$QWEN_API_KEY" && [[ -n "$QWEN_ANTHROPIC_BASE_URL" ]]; then
-        export ANTHROPIC_BASE_URL="$QWEN_ANTHROPIC_BASE_URL"
-        export ANTHROPIC_API_URL="$QWEN_ANTHROPIC_BASE_URL"
+    if is_effectively_set "$QWEN_API_KEY"; then
+        # 阿里云 DashScope 官方 Claude 代理端点
+        export ANTHROPIC_BASE_URL="https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy"
+        export ANTHROPIC_API_URL="https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy"
         export ANTHROPIC_AUTH_TOKEN="$QWEN_API_KEY"
         export ANTHROPIC_API_KEY="$QWEN_API_KEY"
-        # 若你有官方 Qwen 的具体模型ID，可在此设置；默认启用思考模型占位
-        export ANTHROPIC_MODEL="qwen3-next-80b-a3b-thinking"
-        export ANTHROPIC_SMALL_FAST_MODEL="qwen3-next-80b-a3b-thinking"
-        echo -e "${GREEN}✅ 已切换到 Qwen（官方配置）${NC}"
+        # 阿里云 DashScope 支持的模型
+        local qwen_model="${QWEN_MODEL:-qwen3-max}"
+        local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-instruct}"
+        export ANTHROPIC_MODEL="$qwen_model"
+        export ANTHROPIC_SMALL_FAST_MODEL="$qwen_small"
+        echo -e "${GREEN}✅ 已切换到 Qwen（阿里云 DashScope 官方）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         export ANTHROPIC_BASE_URL="https://api.ppinfra.com/openai/v1/anthropic"
         export ANTHROPIC_API_URL="https://api.ppinfra.com/openai/v1/anthropic"
@@ -391,7 +390,7 @@ show_help() {
     echo "  🌙 KIMI2               - 官方：kimi-k2-0905-preview"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
 echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
-    echo "  🐪 Qwen                - 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
+    echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
     echo "  🇨🇳 GLM4.5             - 官方：glm-4.5 / glm-4.5-air"
     echo "  🧠 Claude Sonnet 4     - claude-sonnet-4-20250514"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
@@ -406,8 +405,8 @@ ensure_model_override_defaults() {
         "KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview"
 "LONGCAT_MODEL=LongCat-Flash-Thinking"
         "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
-        "QWEN_MODEL=qwen3-next-80b-a3b-thinking"
-        "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-thinking"
+        "QWEN_MODEL=qwen3-max"
+        "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct"
 "GLM_MODEL=glm-4.5"
         "GLM_SMALL_FAST_MODEL=glm-4.5-air"
         "CLAUDE_MODEL=claude-sonnet-4-20250514"
@@ -545,16 +544,16 @@ local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
             fi
             ;;
         "qwen")
-            if is_effectively_set "$QWEN_API_KEY" && [[ -n "$QWEN_ANTHROPIC_BASE_URL" ]]; then
+            if is_effectively_set "$QWEN_API_KEY"; then
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='${QWEN_ANTHROPIC_BASE_URL}'"
-                echo "export ANTHROPIC_API_URL='${QWEN_ANTHROPIC_BASE_URL}'"
+                echo "export ANTHROPIC_BASE_URL='https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy'"
+                echo "export ANTHROPIC_API_URL='https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy'"
                 echo "if [ -z \"\${QWEN_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${QWEN_API_KEY}\""
-                local qwen_model="${QWEN_MODEL:-qwen3-next-80b-a3b-thinking}"
-                local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-thinking}"
+                local qwen_model="${QWEN_MODEL:-qwen3-max}"
+                local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-instruct}"
                 echo "export ANTHROPIC_MODEL='${qwen_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
@@ -570,7 +569,7 @@ local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
                 echo "export ANTHROPIC_MODEL='${qwen_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
             else
-                echo "# ❌ 未检测到 QWEN_API_KEY / QWEN_ANTHROPIC_BASE_URL 或 PPINFRA_API_KEY" 1>&2
+                echo "# ❌ 未检测到 QWEN_API_KEY 或 PPINFRA_API_KEY" 1>&2
                 return 1
             fi
             ;;
