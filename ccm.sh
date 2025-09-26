@@ -71,7 +71,8 @@ EOF
     
     # 智能加载：只有环境变量未设置的键才从配置文件读取
     local temp_file=$(mktemp)
-    while IFS='=' read -r key value; do
+    local raw
+    while IFS= read -r raw || [[ -n "$raw" ]]; do
         # 去掉回车、去掉行内注释并修剪两端空白
         raw=${raw%$'\r'}
         # 跳过注释和空行
@@ -578,8 +579,8 @@ local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://open.bigmodel.cn/api/paas/v4/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/paas/v4/anthropic'"
+                echo "export ANTHROPIC_BASE_URL='https://open.bigmodel.cn/api/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/anthropic'"
                 echo "if [ -z \"\${GLM_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${GLM_API_KEY}\""
 local glm_model="${GLM_MODEL:-glm-4.5}"
