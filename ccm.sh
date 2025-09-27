@@ -18,14 +18,86 @@ NC='\033[0m' # No Color
 # 配置文件路径
 CONFIG_FILE="$HOME/.ccm_config"
 
+# 多语言支持
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+LANG_DIR="$SCRIPT_DIR/lang"
+
+# 加载翻译
+load_translations() {
+    local lang_code="${1:-en}"
+    local lang_file="$LANG_DIR/${lang_code}.json"
+
+    # 如果语言文件不存在，默认使用英语
+    if [[ ! -f "$lang_file" ]]; then
+        lang_code="en"
+        lang_file="$LANG_DIR/en.json"
+    fi
+
+    # 如果英语文件也不存在，使用内置英文
+    if [[ ! -f "$lang_file" ]]; then
+        return 0
+    fi
+
+    # 清理现有翻译变量
+    unset $(set | grep '^TRANS_' | cut -d= -f1) 2>/dev/null || true
+
+    # 读取JSON文件并解析到变量
+    if [[ -f "$lang_file" ]]; then
+        local temp_file=$(mktemp)
+        # 提取键值对到临时文件，使用更健壮的方法
+        grep -o '"[^"]*":[[:space:]]*"[^"]*"' "$lang_file" | sed 's/^"\([^"]*\)":[[:space:]]*"\([^"]*\)"$/\1|\2/' > "$temp_file"
+
+        # 读取临时文件并设置变量（使用TRANS_前缀）
+        while IFS='|' read -r key value; do
+            if [[ -n "$key" && -n "$value" ]]; then
+                # 处理转义字符
+                value="${value//\\\"/\"}"
+                value="${value//\\\\/\\}"
+                # 使用eval设置动态变量名
+                eval "TRANS_${key}=\"\$value\""
+            fi
+        done < "$temp_file"
+
+        rm -f "$temp_file"
+    fi
+}
+
+# 获取翻译文本
+t() {
+    local key="$1"
+    local default="${2:-$key}"
+    local var_name="TRANS_${key}"
+    local value
+    eval "value=\"\${${var_name}:-}\""
+    echo "${value:-$default}"
+}
+
+# 检测系统语言
+detect_language() {
+    # 首先检查环境变量LANG
+    local sys_lang="${LANG:-}"
+    if [[ "$sys_lang" =~ ^zh ]]; then
+        echo "zh"
+    else
+        echo "en"
+    fi
+}
+
 # 智能加载配置：环境变量优先，配置文件补充
 load_config() {
+    # 初始化语言
+    local lang_preference="${CCM_LANGUAGE:-$(detect_language)}"
+    load_translations "$lang_preference"
+
     # 创建配置文件（如果不存在）
     if [[ ! -f "$CONFIG_FILE" ]]; then
         cat > "$CONFIG_FILE" << 'EOF'
 # CCM 配置文件
 # 请替换为你的实际API密钥
 # 注意：环境变量中的API密钥优先级高于此文件
+
+# 语言设置 (en: English, zh: 中文)
+CCM_LANGUAGE=en
 
 # Deepseek
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
@@ -64,11 +136,22 @@ LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key  # https://api.ppinfra.com/openai/v1/anthropic
 EOF
-        echo -e "${YELLOW}⚠️  配置文件已创建: $CONFIG_FILE${NC}"
-        echo -e "${YELLOW}   请编辑此文件添加你的API密钥${NC}"
+        echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}"
+        echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}"
         return 1
     fi
     
+    # 首先读取语言设置
+    if [[ -f "$CONFIG_FILE" ]]; then
+        local config_lang
+        config_lang=$(grep -E "^[[:space:]]*CCM_LANGUAGE[[:space:]]*=" "$CONFIG_FILE" 2>/dev/null | head -1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+        if [[ -n "$config_lang" && -z "$CCM_LANGUAGE" ]]; then
+            export CCM_LANGUAGE="$config_lang"
+            lang_preference="$config_lang"
+            load_translations "$lang_preference"
+        fi
+    fi
+
     # 智能加载：只有环境变量未设置的键才从配置文件读取
     local temp_file=$(mktemp)
     local raw
@@ -111,6 +194,9 @@ create_default_config() {
 # 请替换为你的实际API密钥
 # 注意：环境变量中的API密钥优先级高于此文件
 
+# 语言设置 (en: English, zh: 中文)
+CCM_LANGUAGE=en
+
 # Deepseek
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 
@@ -148,8 +234,8 @@ LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 # 备用提供商（仅当且仅当官方密钥未提供时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key  # https://api.ppinfra.com/openai/v1/anthropic
 EOF
-    echo -e "${YELLOW}⚠️  配置文件已创建: $CONFIG_FILE${NC}"
-    echo -e "${YELLOW}   请编辑此文件添加你的API密钥${NC}"
+    echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}"
+    echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}"
 }
 
 # 判断值是否为有效（非空且非占位符）
@@ -175,13 +261,13 @@ mask_token() {
     local t="$1"
     local n=${#t}
     if [[ -z "$t" ]]; then
-        echo "[未设置]"
+        echo "[$(t 'not_set')]"
         return
     fi
     if (( n <= 8 )); then
-        echo "[已设置] ****"
+        echo "[$(t 'set')] ****"
     else
-        echo "[已设置] ${t:0:4}...${t:n-4:4}"
+        echo "[$(t 'set')] ${t:0:4}...${t:n-4:4}"
     fi
 }
 
@@ -189,22 +275,22 @@ mask_presence() {
     local v_name="$1"
     local v_val="${!v_name}"
     if is_effectively_set "$v_val"; then
-        echo "[已设置]"
+        echo "[$(t 'set')]"
     else
-        echo "[未设置]"
+        echo "[$(t 'not_set')]"
     fi
 }
 
 # 显示当前状态（脱敏）
 show_status() {
-    echo -e "${BLUE}📊 当前模型配置:${NC}"
-    echo "   BASE_URL: ${ANTHROPIC_BASE_URL:-'默认 (Anthropic)'}"
+    echo -e "${BLUE}📊 $(t 'current_model_config'):${NC}"
+    echo "   BASE_URL: ${ANTHROPIC_BASE_URL:-'Default (Anthropic)'}"
     echo -n "   AUTH_TOKEN: "
     mask_token "${ANTHROPIC_AUTH_TOKEN}"
-    echo "   MODEL: ${ANTHROPIC_MODEL:-'未设置'}"
-    echo "   SMALL_MODEL: ${ANTHROPIC_SMALL_FAST_MODEL:-'未设置'}"
+    echo "   MODEL: ${ANTHROPIC_MODEL:-'$(t "not_set")'}"
+    echo "   SMALL_MODEL: ${ANTHROPIC_SMALL_FAST_MODEL:-'$(t "not_set")'}"
     echo ""
-    echo -e "${BLUE}🔧 环境变量状态:${NC}"
+    echo -e "${BLUE}🔧 $(t 'env_vars_status'):${NC}"
     echo "   GLM_API_KEY: $(mask_presence GLM_API_KEY)"
     echo "   KIMI_API_KEY: $(mask_presence KIMI_API_KEY)"
     echo "   LONGCAT_API_KEY: $(mask_presence LONGCAT_API_KEY)"
@@ -227,7 +313,7 @@ clean_env() {
 
 # 切换到Deepseek
 switch_to_deepseek() {
-    echo -e "${YELLOW}🔄 切换到 Deepseek 模型...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') Deepseek $(t 'model')...${NC}"
     clean_env
     if is_effectively_set "$DEEPSEEK_API_KEY"; then
         # 官方 Deepseek 的 Anthropic 兼容端点
@@ -237,7 +323,7 @@ switch_to_deepseek() {
         export ANTHROPIC_API_KEY="$DEEPSEEK_API_KEY"
         export ANTHROPIC_MODEL="deepseek-chat"
         export ANTHROPIC_SMALL_FAST_MODEL="deepseek-coder"
-        echo -e "${GREEN}✅ 已切换到 Deepseek（官方）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') Deepseek（$(t 'official')）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         # 备用：PPINFRA Anthropic 兼容
         export ANTHROPIC_BASE_URL="https://api.ppinfra.com/openai/v1/anthropic"
@@ -246,9 +332,9 @@ switch_to_deepseek() {
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
         export ANTHROPIC_MODEL="deepseek/deepseek-v3.1"
         export ANTHROPIC_SMALL_FAST_MODEL="deepseek/deepseek-v3.1"
-        echo -e "${GREEN}✅ 已切换到 Deepseek（PPINFRA 备用）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') Deepseek（$(t 'ppinfra_backup')）${NC}"
     else
-        echo -e "${RED}❌ 未检测到 DEEPSEEK_API_KEY，且 PPINFRA_API_KEY 未配置，无法切换${NC}"
+        echo -e "${RED}❌ $(t 'not_detected') DEEPSEEK_API_KEY，$(t 'and') PPINFRA_API_KEY $(t 'not_configured')，$(t 'cannot_switch')${NC}"
         return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
@@ -257,29 +343,29 @@ switch_to_deepseek() {
 
 # 切换到Claude Sonnet
 switch_to_claude() {
-    echo -e "${YELLOW}🔄 切换到 Claude Sonnet 4...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Sonnet 4...${NC}"
     clean_env
     export ANTHROPIC_MODEL="claude-sonnet-4-20250514"
     export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-20250514"
-    echo -e "${GREEN}✅ 已切换到 Claude Sonnet 4 (使用 Claude Pro 订阅)${NC}"
+    echo -e "${GREEN}✅ $(t 'switched_to') Claude Sonnet 4 ($(t 'using_pro_subscription'))${NC}"
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
 # 切换到Claude Opus
 switch_to_opus() {
-    echo -e "${YELLOW}🔄 切换到 Claude Opus 4.1...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Opus 4.1...${NC}"
     clean_env
     export ANTHROPIC_MODEL="claude-opus-4-1-20250805"
     export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-20250514"
-    echo -e "${GREEN}✅ 已切换到 Claude Opus 4.1 (使用 Claude Pro 订阅)${NC}"
+    echo -e "${GREEN}✅ $(t 'switched_to') Claude Opus 4.1 ($(t 'using_pro_subscription'))${NC}"
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
 # 切换到GLM4.5
 switch_to_glm() {
-    echo -e "${YELLOW}🔄 切换到 GLM4.5 模型...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') GLM4.5 $(t 'model')...${NC}"
     clean_env
     if is_effectively_set "$GLM_API_KEY"; then
         export ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
@@ -288,9 +374,9 @@ switch_to_glm() {
         export ANTHROPIC_API_KEY="$GLM_API_KEY"
         export ANTHROPIC_MODEL="glm-4.5"
         export ANTHROPIC_SMALL_FAST_MODEL="glm-4.5"
-        echo -e "${GREEN}✅ 已切换到 GLM4.5（官方）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') GLM4.5（$(t 'official')）${NC}"
     else
-        echo -e "${RED}❌ 未检测到 GLM_API_KEY。按要求，GLM 不走 PPINFRA 备用，请配置官方密钥${NC}"
+        echo -e "${RED}❌ $(t 'not_detected') GLM_API_KEY。$(t 'glm_official_only')${NC}"
         return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
@@ -300,7 +386,7 @@ switch_to_glm() {
 
 # 切换到KIMI2
 switch_to_kimi() {
-    echo -e "${YELLOW}🔄 切换到 KIMI2 模型...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') KIMI2 $(t 'model')...${NC}"
     clean_env
     if is_effectively_set "$KIMI_API_KEY"; then
         # 官方 Moonshot KIMI 的 Anthropic 兼容端点
@@ -310,7 +396,7 @@ switch_to_kimi() {
         export ANTHROPIC_API_KEY="$KIMI_API_KEY"
         export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
         export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
-        echo -e "${GREEN}✅ 已切换到 KIMI2（官方）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') KIMI2（$(t 'official')）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         # 备用：PPINFRA Anthropic 兼容
         export ANTHROPIC_BASE_URL="https://api.ppinfra.com/openai/v1/anthropic"
@@ -319,9 +405,9 @@ switch_to_kimi() {
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
         export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
         export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
-        echo -e "${GREEN}✅ 已切换到 KIMI2（PPINFRA 备用）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') KIMI2（$(t 'ppinfra_backup')）${NC}"
     else
-        echo -e "${RED}❌ 未检测到 KIMI_API_KEY，且 PPINFRA_API_KEY 未配置，无法切换${NC}"
+        echo -e "${RED}❌ $(t 'not_detected') KIMI_API_KEY，$(t 'and') PPINFRA_API_KEY $(t 'not_configured')，$(t 'cannot_switch')${NC}"
         return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
@@ -331,7 +417,7 @@ switch_to_kimi() {
 
 # 切换到 Qwen（阿里云官方优先，缺省走 PPINFRA）
 switch_to_qwen() {
-    echo -e "${YELLOW}🔄 切换到 Qwen 模型...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') Qwen $(t 'model')...${NC}"
     clean_env
     if is_effectively_set "$QWEN_API_KEY"; then
         # 阿里云 DashScope 官方 Claude 代理端点
@@ -344,7 +430,7 @@ switch_to_qwen() {
         local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-instruct}"
         export ANTHROPIC_MODEL="$qwen_model"
         export ANTHROPIC_SMALL_FAST_MODEL="$qwen_small"
-        echo -e "${GREEN}✅ 已切换到 Qwen（阿里云 DashScope 官方）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') Qwen（$(t 'alibaba_dashscope_official')）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         export ANTHROPIC_BASE_URL="https://api.ppinfra.com/openai/v1/anthropic"
         export ANTHROPIC_API_URL="https://api.ppinfra.com/openai/v1/anthropic"
@@ -352,9 +438,9 @@ switch_to_qwen() {
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
         export ANTHROPIC_MODEL="qwen3-next-80b-a3b-thinking"
         export ANTHROPIC_SMALL_FAST_MODEL="qwen3-next-80b-a3b-thinking"
-        echo -e "${GREEN}✅ 已切换到 Qwen（PPINFRA 备用）${NC}"
+        echo -e "${GREEN}✅ $(t 'switched_to') Qwen（$(t 'ppinfra_backup')）${NC}"
     else
-        echo -e "${RED}❌ 未检测到 QWEN_API_KEY 或 PPINFRA_API_KEY，无法切换${NC}"
+        echo -e "${RED}❌ $(t 'not_detected') QWEN_API_KEY $(t 'or') PPINFRA_API_KEY，$(t 'cannot_switch')${NC}"
         return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
@@ -364,37 +450,37 @@ switch_to_qwen() {
 
 # 显示帮助信息
 show_help() {
-    echo -e "${BLUE}🔧 Claude Code 模型切换工具 v2.1.0${NC}"
+    echo -e "${BLUE}🔧 $(t 'switching_info') v2.1.0${NC}"
     echo ""
-    echo -e "${YELLOW}用法:${NC} $(basename "$0") [选项]"
+    echo -e "${YELLOW}$(t 'usage'):${NC} $(basename "$0") [options]"
     echo ""
-    echo -e "${YELLOW}模型选项（与 env 等价，输出 export 语句，便于 eval）:${NC}"
-    echo "  deepseek, ds       - 等同于: env deepseek"
-    echo "  kimi, kimi2        - 等同于: env kimi"
-    echo "  longcat, lc        - 等同于: env longcat"
-    echo "  qwen               - 等同于: env qwen"
-    echo "  glm, glm4          - 等同于: env glm"
-    echo "  claude, sonnet, s  - 等同于: env claude"
-    echo "  opus, o            - 等同于: env opus"
+    echo -e "${YELLOW}$(t 'model_options'):${NC}"
+    echo "  deepseek, ds       - env deepseek"
+    echo "  kimi, kimi2        - env kimi"
+    echo "  longcat, lc        - env longcat"
+    echo "  qwen               - env qwen"
+    echo "  glm, glm4          - env glm"
+    echo "  claude, sonnet, s  - env claude"
+    echo "  opus, o            - env opus"
     echo ""
-    echo -e "${YELLOW}工具选项:${NC}"
-    echo "  status, st       - 显示当前配置（脱敏显示）"
-    echo "  env [模型]       - 仅输出 export 语句（用于 eval），不打印密钥明文"
-    echo "  config, cfg      - 编辑配置文件"
-    echo "  help, h          - 显示此帮助信息"
+    echo -e "${YELLOW}$(t 'tool_options'):${NC}"
+    echo "  status, st       - $(t 'show_current_config')"
+    echo "  env [model]      - $(t 'output_export_only')"
+    echo "  config, cfg      - $(t 'edit_config_file')"
+    echo "  help, h          - $(t 'show_help')"
     echo ""
-    echo -e "${YELLOW}示例:${NC}"
-    echo "  eval \"$($(basename \"$0\") deepseek)\"      # 在当前 shell 中生效（推荐）"
-    echo "  $(basename "$0") status                      # 查看当前状态（脱敏）"
+    echo -e "${YELLOW}$(t 'examples'):${NC}"
+    echo "  eval \"\$(ccm deepseek)\"                   # Apply in current shell (recommended)"
+    echo "  $(basename "$0") status                      # Check current status (masked)"
     echo ""
-    echo -e "${YELLOW}支持的模型:${NC}"
-    echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
-    echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
-echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
-    echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
-    echo "  🇨🇳 GLM4.5             - 官方：glm-4.5 / glm-4.5-air"
-    echo "  🧠 Claude Sonnet 4     - claude-sonnet-4-20250514"
-    echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
+    echo -e "${YELLOW}$(t 'supported_models'):${NC}"
+    echo "  🌙 KIMI2               - $(t 'official'): kimi-k2-turbo-preview"
+    echo "  🤖 Deepseek            - $(t 'deepseek_features')"
+    echo "  🐱 LongCat             - $(t 'longcat_features')"
+    echo "  🐪 Qwen                - $(t 'qwen_features')"
+    echo "  🇨🇳 GLM4.5             - $(t 'glm_features')"
+    echo "  🧠 Claude Sonnet 4     - $(t 'claude_sonnet_features')"
+    echo "  🚀 Claude Opus 4.1     - $(t 'claude_opus_features')"
 }
 
 # 将缺失的模型ID覆盖项追加到配置文件（仅追加缺失项，不覆盖已存在的配置）
@@ -436,39 +522,39 @@ ensure_model_override_defaults() {
 edit_config() {
     # 确保配置文件存在
     if [[ ! -f "$CONFIG_FILE" ]]; then
-        echo -e "${YELLOW}📝 配置文件不存在，正在创建: $CONFIG_FILE${NC}"
+        echo -e "${YELLOW}📝 $(t 'config_created'): $CONFIG_FILE${NC}"
         create_default_config
     fi
 
     # 追加缺失的模型ID覆盖默认值（不触碰已有键）
     ensure_model_override_defaults
-    
-    echo -e "${BLUE}🔧 打开配置文件进行编辑...${NC}"
-    echo -e "${YELLOW}配置文件路径: $CONFIG_FILE${NC}"
+
+    echo -e "${BLUE}🔧 $(t 'opening_config_file')...${NC}"
+    echo -e "${YELLOW}$(t 'config_file_path'): $CONFIG_FILE${NC}"
     
     # 按优先级尝试不同的编辑器
     if command -v cursor >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ 使用 Cursor 编辑器打开配置文件${NC}"
+        echo -e "${GREEN}✅ $(t 'using_cursor')${NC}"
         cursor "$CONFIG_FILE" &
-        echo -e "${YELLOW}💡 配置文件已在 Cursor 中打开，编辑完成后保存即可生效${NC}"
+        echo -e "${YELLOW}💡 $(t 'config_opened') Cursor $(t 'opened_edit_save')${NC}"
     elif command -v code >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ 使用 VS Code 编辑器打开配置文件${NC}"
+        echo -e "${GREEN}✅ $(t 'using_vscode')${NC}"
         code "$CONFIG_FILE" &
-        echo -e "${YELLOW}💡 配置文件已在 VS Code 中打开，编辑完成后保存即可生效${NC}"
+        echo -e "${YELLOW}💡 $(t 'config_opened') VS Code $(t 'opened_edit_save')${NC}"
     elif [[ "$OSTYPE" == "darwin"* ]] && command -v open >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ 使用默认编辑器打开配置文件${NC}"
+        echo -e "${GREEN}✅ $(t 'using_default_editor')${NC}"
         open "$CONFIG_FILE"
-        echo -e "${YELLOW}💡 配置文件已用系统默认编辑器打开${NC}"
+        echo -e "${YELLOW}💡 $(t 'config_opened_default')${NC}"
     elif command -v vim >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ 使用 vim 编辑器打开配置文件${NC}"
+        echo -e "${GREEN}✅ $(t 'using_vim')${NC}"
         vim "$CONFIG_FILE"
     elif command -v nano >/dev/null 2>&1; then
-        echo -e "${GREEN}✅ 使用 nano 编辑器打开配置文件${NC}"
+        echo -e "${GREEN}✅ $(t 'using_nano')${NC}"
         nano "$CONFIG_FILE"
     else
-        echo -e "${RED}❌ 未找到可用的编辑器${NC}"
-        echo -e "${YELLOW}请手动编辑配置文件: $CONFIG_FILE${NC}"
-        echo -e "${YELLOW}或安装以下编辑器之一: cursor, code, vim, nano${NC}"
+        echo -e "${RED}❌ $(t 'no_editor_found')${NC}"
+        echo -e "${YELLOW}$(t 'edit_manually'): $CONFIG_FILE${NC}"
+        echo -e "${YELLOW}$(t 'install_editor'): cursor, code, vim, nano${NC}"
         return 1
     fi
 }
@@ -490,7 +576,7 @@ emit_env_exports() {
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
                 echo "export ANTHROPIC_BASE_URL='https://api.deepseek.com/anthropic'"
                 echo "export ANTHROPIC_API_URL='https://api.deepseek.com/anthropic'"
-                echo "# 如果环境变量中未设置，将从 ~/.ccm_config 读取"
+                echo "# $(t 'export_if_env_not_set')"
                 echo "if [ -z \"\${DEEPSEEK_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${DEEPSEEK_API_KEY}\""
                 local ds_model="${DEEPSEEK_MODEL:-deepseek-chat}"
@@ -510,7 +596,7 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${ds_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
             else
-                echo "# ❌ 未检测到 DEEPSEEK_API_KEY 或 PPINFRA_API_KEY" 1>&2
+                echo "# ❌ $(t 'not_detected') DEEPSEEK_API_KEY $(t 'or') PPINFRA_API_KEY" 1>&2
                 return 1
             fi
             ;;
@@ -540,7 +626,7 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${kimi_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             else
-                echo "# ❌ 未检测到 KIMI_API_KEY 或 PPINFRA_API_KEY" 1>&2
+                echo "# ❌ $(t 'not_detected') KIMI_API_KEY $(t 'or') PPINFRA_API_KEY" 1>&2
                 return 1
             fi
             ;;
@@ -570,7 +656,7 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${qwen_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
             else
-                echo "# ❌ 未检测到 QWEN_API_KEY 或 PPINFRA_API_KEY" 1>&2
+                echo "# ❌ $(t 'not_detected') QWEN_API_KEY $(t 'or') PPINFRA_API_KEY" 1>&2
                 return 1
             fi
             ;;
@@ -588,7 +674,7 @@ local glm_model="${GLM_MODEL:-glm-4.5}"
                 echo "export ANTHROPIC_MODEL='${glm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${glm_small}'"
             else
-                echo "# ❌ GLM 仅支持官方密钥，请设置 GLM_API_KEY" 1>&2
+                echo "# ❌ GLM $(t 'requires_official_key') GLM_API_KEY" 1>&2
                 return 1
             fi
             ;;
@@ -631,12 +717,12 @@ local lc_model="${LONGCAT_MODEL:-LongCat-Flash-Thinking}"
                 echo "export ANTHROPIC_MODEL='${lc_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${lc_small}'"
             else
-                echo "# ❌ 未检测到 LONGCAT_API_KEY" 1>&2
+                echo "# ❌ $(t 'not_detected') LONGCAT_API_KEY" 1>&2
                 return 1
             fi
             ;;
         *)
-            echo "# 用法: $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus]" 1>&2
+            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus]" 1>&2
             return 1
             ;;
     esac
@@ -687,7 +773,7 @@ main() {
             show_help
             ;;
         *)
-            echo -e "${RED}❌ 未知选项: $1${NC}"
+            echo -e "${RED}❌ $(t 'unknown_option'): $1${NC}"
             echo ""
             show_help
             return 1
