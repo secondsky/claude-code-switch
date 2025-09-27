@@ -69,6 +69,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- 🌙 **KIMI2**: Updated default endpoint to `https://api.moonshot.cn/anthropic` and default model to `kimi-k2-turbo-preview`
+- 🗝️ Configuration examples now reference `your-moonshot-api-key` for Moonshot credentials
+
 ### Planned
 - [ ] Add support for more AI models (Anthropic, Google Gemini, etc.)
 - [ ] Configuration validation and health checks

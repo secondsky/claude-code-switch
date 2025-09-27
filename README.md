@@ -52,7 +52,7 @@ Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secret
 
 | Model | Official Support | Fallback Support(PPINFRA) | Features |
 |-------|------------------|---------------------------|----------|
-| 🌙 **KIMI2** | ✅ moonshot-v1-128k | ✅ moonshotai/kimi-k2-0905 | Long text processing |
+| 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | Long text processing |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
@@ -93,7 +93,7 @@ CCM follows a smart configuration hierarchy:
 ```bash
 # Option 1: Set environment variables (recommended for security)
 export DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-export KIMI_API_KEY=your-kimi-api-key
+export KIMI_API_KEY=your-moonshot-api-key
 export LONGCAT_API_KEY=your-longcat-api-key
 export QWEN_API_KEY=sk-your-qwen-api-key
 export PPINFRA_API_KEY=your-ppinfra-api-key
@@ -110,7 +110,7 @@ Configuration file example:
 
 # Official API keys
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-KIMI_API_KEY=your-kimi-api-key
+KIMI_API_KEY=your-moonshot-api-key
 LONGCAT_API_KEY=your-longcat-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key  # Alibaba Cloud DashScope
@@ -118,8 +118,8 @@ QWEN_API_KEY=your-qwen-api-key  # Alibaba Cloud DashScope
 # Optional: override model IDs (if omitted, defaults are used)
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-0905-preview
-KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
+KIMI_MODEL=kimi-k2-turbo-preview
+KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 QWEN_MODEL=qwen3-max
@@ -185,10 +185,10 @@ ccm st           # Short for status
 ccm kimi
 ccm status
 📊 Current model configuration:
-   BASE_URL: https://api.moonshot.cn/v1/anthropic
+   BASE_URL: https://api.moonshot.cn/anthropic
    AUTH_TOKEN: [Set]
-   MODEL: kimi-k2-0905-preview
-   SMALL_MODEL: kimi-k2-0905-preview
+   MODEL: kimi-k2-turbo-preview
+   SMALL_MODEL: kimi-k2-turbo-preview
 
 # Switch to Deepseek for code generation
 ccm ds
@@ -284,7 +284,7 @@ Qwen models are now officially integrated with Alibaba Cloud DashScope:
 PPINFRA is a third-party AI model aggregation service providing:
 - Base URL: `https://api.ppinfra.com/openai/v1/anthropic`
 - Supported models:
-  - `moonshotai/kimi-k2-0905` (KIMI fallback)
+  - `kimi-k2-turbo-preview` (KIMI fallback)
   - `deepseek/deepseek-v3.1` (Deepseek fallback)
   - `qwen3-next-80b-a3b-thinking` (Qwen fallback)
 
@@ -295,7 +295,7 @@ PPINFRA is a third-party AI model aggregation service providing:
 ```bash
 # Required: Official keys from various providers (at least one)
 DEEPSEEK_API_KEY=sk-your-deepseek-key
-KIMI_API_KEY=your-kimi-key  
+KIMI_API_KEY=your-moonshot-api-key
 GLM_API_KEY=your-glm-key
 QWEN_API_KEY=your-qwen-key
 

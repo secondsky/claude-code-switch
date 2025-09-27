@@ -34,7 +34,7 @@ DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 GLM_API_KEY=your-glm-api-key
 
 # KIMI2 (月之暗面)
-KIMI_API_KEY=your-kimi-api-key
+KIMI_API_KEY=your-moonshot-api-key
 
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
@@ -48,8 +48,8 @@ CLAUDE_API_KEY=your-claude-api-key
 # —— 可选：模型ID覆盖（不设置则使用下方默认）——
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-0905-preview
-KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
+KIMI_MODEL=kimi-k2-turbo-preview
+KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
 GLM_MODEL=glm-4.5
@@ -118,7 +118,7 @@ DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 GLM_API_KEY=your-glm-api-key
 
 # KIMI2 (月之暗面)
-KIMI_API_KEY=your-kimi-api-key
+KIMI_API_KEY=your-moonshot-api-key
 
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
@@ -132,8 +132,8 @@ CLAUDE_API_KEY=your-claude-api-key
 # —— 可选：模型ID覆盖（不设置则使用下方默认）——
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-0905-preview
-KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview
+KIMI_MODEL=kimi-k2-turbo-preview
+KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
 GLM_MODEL=glm-4.5
@@ -304,12 +304,12 @@ switch_to_kimi() {
     clean_env
     if is_effectively_set "$KIMI_API_KEY"; then
         # 官方 Moonshot KIMI 的 Anthropic 兼容端点
-        export ANTHROPIC_BASE_URL="https://api.moonshot.cn/v1/anthropic"
-        export ANTHROPIC_API_URL="https://api.moonshot.cn/v1/anthropic"
+        export ANTHROPIC_BASE_URL="https://api.moonshot.cn/anthropic"
+        export ANTHROPIC_API_URL="https://api.moonshot.cn/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$KIMI_API_KEY"
         export ANTHROPIC_API_KEY="$KIMI_API_KEY"
-        export ANTHROPIC_MODEL="moonshot-v1-128k"
-        export ANTHROPIC_SMALL_FAST_MODEL="moonshot-v1-8k"
+        export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
+        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
         echo -e "${GREEN}✅ 已切换到 KIMI2（官方）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         # 备用：PPINFRA Anthropic 兼容
@@ -317,8 +317,8 @@ switch_to_kimi() {
         export ANTHROPIC_API_URL="https://api.ppinfra.com/openai/v1/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
-        export ANTHROPIC_MODEL="moonshotai/kimi-k2-0905"
-        export ANTHROPIC_SMALL_FAST_MODEL="moonshotai/kimi-k2-0905"
+        export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
+        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
         echo -e "${GREEN}✅ 已切换到 KIMI2（PPINFRA 备用）${NC}"
     else
         echo -e "${RED}❌ 未检测到 KIMI_API_KEY，且 PPINFRA_API_KEY 未配置，无法切换${NC}"
@@ -388,7 +388,7 @@ show_help() {
     echo "  $(basename "$0") status                      # 查看当前状态（脱敏）"
     echo ""
     echo -e "${YELLOW}支持的模型:${NC}"
-    echo "  🌙 KIMI2               - 官方：kimi-k2-0905-preview"
+    echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
 echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
     echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
@@ -402,13 +402,13 @@ ensure_model_override_defaults() {
     local -a pairs=(
         "DEEPSEEK_MODEL=deepseek-chat"
         "DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat"
-"KIMI_MODEL=kimi-k2-0905-preview"
-        "KIMI_SMALL_FAST_MODEL=kimi-k2-0905-preview"
-"LONGCAT_MODEL=LongCat-Flash-Thinking"
+        "KIMI_MODEL=kimi-k2-turbo-preview"
+        "KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview"
+        "LONGCAT_MODEL=LongCat-Flash-Thinking"
         "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
         "QWEN_MODEL=qwen3-max"
         "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct"
-"GLM_MODEL=glm-4.5"
+        "GLM_MODEL=glm-4.5"
         "GLM_SMALL_FAST_MODEL=glm-4.5-air"
         "CLAUDE_MODEL=claude-sonnet-4-20250514"
         "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514"
@@ -519,12 +519,12 @@ emit_env_exports() {
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.moonshot.cn/v1/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.moonshot.cn/v1/anthropic'"
+                echo "export ANTHROPIC_BASE_URL='https://api.moonshot.cn/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.moonshot.cn/anthropic'"
                 echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${KIMI_API_KEY}\""
-local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
-                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-0905-preview}"
+                local kimi_model="${KIMI_MODEL:-kimi-k2-turbo-preview}"
+                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-turbo-preview}"
                 echo "export ANTHROPIC_MODEL='${kimi_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
@@ -535,8 +535,8 @@ local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/openai/v1/anthropic'"
                 echo "if [ -z \"\${PPINFRA_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-local kimi_model="${KIMI_MODEL:-kimi-k2-0905-preview}"
-                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-0905-preview}"
+                local kimi_model="${KIMI_MODEL:-kimi-k2-turbo-preview}"
+                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-turbo-preview}"
                 echo "export ANTHROPIC_MODEL='${kimi_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             else

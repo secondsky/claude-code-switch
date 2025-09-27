@@ -50,7 +50,7 @@ ccm status
 
 | 模型 | 官方支持 | 备用支持(PPINFRA) | 特色 |
 |------|---------|------------------|------|
-| 🌙 **KIMI2** | ✅ moonshot-v1-128k | ✅ moonshotai/kimi-k2-0905 | 长文本处理 |
+| 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | 长文本处理 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
@@ -91,7 +91,7 @@ CCM 采用智能的配置层次结构：
 ```bash
 # 方式1：设置环境变量（推荐，安全性更好）
 export DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-export KIMI_API_KEY=your-kimi-api-key
+export KIMI_API_KEY=your-moonshot-api-key
 export LONGCAT_API_KEY=your-longcat-api-key
 export QWEN_API_KEY=sk-your-qwen-api-key
 export PPINFRA_API_KEY=your-ppinfra-api-key
@@ -108,7 +108,7 @@ export PPINFRA_API_KEY=your-ppinfra-api-key
 
 # 官方API密钥
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-KIMI_API_KEY=your-kimi-api-key
+KIMI_API_KEY=your-moonshot-api-key
 LONGCAT_API_KEY=your-longcat-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key  # 阿里云 DashScope
@@ -167,8 +167,8 @@ ccm status
 $ ./ccm.sh kimi
 🔄 切换到 KIMI2 模型...
 ✅ 已切换到 KIMI2（官方）
-   BASE_URL: https://api.moonshot.cn/v1/anthropic
-   MODEL: kimi-k2-0905-preview
+   BASE_URL: https://api.moonshot.cn/anthropic
+   MODEL: kimi-k2-turbo-preview
 
 # 切换到Deepseek进行代码生成（如果没有官方key，自动使用备用）
 $ ./ccm.sh deepseek  
@@ -266,7 +266,7 @@ CCM实现了智能的备用机制：
 PPINFRA是一个第三方AI模型聚合服务，提供：
 - Base URL: `https://api.ppinfra.com/openai/v1/anthropic`
 - 支持模型：
-  - `moonshotai/kimi-k2-0905` (KIMI备用)
+  - `kimi-k2-turbo-preview` (KIMI备用)
   - `deepseek/deepseek-v3.1` (Deepseek备用)
   - `qwen3-next-80b-a3b-thinking` (Qwen备用)
 
@@ -277,7 +277,7 @@ PPINFRA是一个第三方AI模型聚合服务，提供：
 ```bash
 # 必需：各服务商官方密钥（至少配置一个）
 DEEPSEEK_API_KEY=sk-your-deepseek-key
-KIMI_API_KEY=your-kimi-key  
+KIMI_API_KEY=your-moonshot-api-key
 GLM_API_KEY=your-glm-key
 QWEN_API_KEY=your-qwen-key
 
