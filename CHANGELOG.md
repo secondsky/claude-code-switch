@@ -21,15 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **KIMI2**: Official moonshot-v1-128k + PPINFRA moonshotai/kimi-k2-0905 fallback
 - **Deepseek**: Official deepseek-chat + PPINFRA deepseek/deepseek-v3.1 fallback
 - **Qwen**: Custom endpoint support + PPINFRA qwen3-next-80b-a3b-thinking fallback
-- **GLM4.5**: Official glm-4-plus (official only)
-- **Claude Sonnet 4**: Official claude-sonnet-4-20250514 (official only)
+- **GLM4.6**: Official glm-4-plus (official only)
+- **Claude Sonnet 4.5**: Official claude-sonnet-4-5-20250929 (official only)
 - **Claude Opus 4.1**: Official claude-opus-4-1-20250805 (official only)
 
 ### Commands
 - `./ccm.sh kimi` - Switch to KIMI2
 - `./ccm.sh deepseek` (or `ds`) - Switch to Deepseek
 - `./ccm.sh qwen` - Switch to Qwen
-- `./ccm.sh glm` - Switch to GLM4.5
+- `./ccm.sh glm` - Switch to GLM4.6
 - `./ccm.sh claude` (or `s`) - Switch to Claude Sonnet 4
 - `./ccm.sh opus` (or `o`) - Switch to Claude Opus 4.1
 - `./ccm.sh status` (or `st`) - Show current configuration

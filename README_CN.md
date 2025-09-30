@@ -54,8 +54,8 @@ ccm status
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
-| 🇨🇳 **GLM4.5** | ✅ glm-4-plus | ❌ 仅官方 | 智谱清言 |
-| 🧠 **Claude Sonnet 4** | ✅ claude-sonnet-4-20250514 | ❌ 仅官方 | 平衡性能 |
+| 🇨🇳 **GLM4.6** | ✅ glm-4-plus | ❌ 仅官方 | 智谱清言 |
+| 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
 
 ## 🚀 快速开始
@@ -126,9 +126,9 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 ccm kimi          # 切换到KIMI2
 ccm deepseek      # 切换到Deepseek  
 ccm qwen          # 切换到Qwen
-ccm glm           # 切换到GLM4.5
+ccm glm           # 切换到GLM4.6
 ccm longcat       # 切换到LongCat
-ccm claude        # 切换到Claude Sonnet 4
+ccm claude        # 切换到Claude Sonnet 4.5
 ccm opus          # 切换到Claude Opus 4.1
 
 # 查看当前状态（脱敏）

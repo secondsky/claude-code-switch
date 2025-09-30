@@ -56,8 +56,8 @@ Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secret
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
-| 🇨🇳 **GLM4.5** | ✅ glm-4-plus | ❌ Official only | Zhipu AI |
-| 🧠 **Claude Sonnet 4** | ✅ claude-sonnet-4-20250514 | ❌ Official only | Balanced performance |
+| 🇨🇳 **GLM4.6** | ✅ glm-4-plus | ❌ Official only | Zhipu AI |
+| 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 
 ## 🚀 Quick Start
@@ -124,12 +124,12 @@ LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
-GLM_MODEL=glm-4.5
+GLM_MODEL=glm-4.6
 GLM_SMALL_FAST_MODEL=glm-4.5-air
-CLAUDE_MODEL=claude-sonnet-4-20250514
-CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+CLAUDE_MODEL=claude-sonnet-4-5-20250929
+CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
-OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 
 # Fallback service (only enabled when official keys are missing)
 PPINFRA_API_KEY=your-ppinfra-api-key
@@ -144,9 +144,9 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 ccm kimi          # Switch to KIMI2
 ccm deepseek      # Switch to Deepseek  
 ccm qwen          # Switch to Qwen
-ccm glm           # Switch to GLM4.5
+ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
-ccm claude        # Switch to Claude Sonnet 4
+ccm claude        # Switch to Claude Sonnet 4.5
 ccm opus          # Switch to Claude Opus 4.1
 
 # View current status (masked)
