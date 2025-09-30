@@ -3,7 +3,7 @@
 # Claude Code Model Switcher (ccm) - 独立版本
 # ---------------------------------------------------------
 # 功能: 在不同AI模型之间快速切换
-# 支持: Claude, Deepseek, GLM4.5, KIMI2
+# 支持: Claude, Deepseek, GLM4.6, KIMI2
 # 作者: Peng
 # 版本: 2.0.0
 ############################################################
@@ -102,7 +102,7 @@ CCM_LANGUAGE=en
 # Deepseek
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 
-# GLM4.5 (智谱清言)
+# GLM4.6 (智谱清言)
 GLM_API_KEY=your-glm-api-key
 
 # KIMI2 (月之暗面)
@@ -124,12 +124,12 @@ KIMI_MODEL=kimi-k2-turbo-preview
 KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
-GLM_MODEL=glm-4.5
+GLM_MODEL=glm-4.6
 GLM_SMALL_FAST_MODEL=glm-4.5-air
-CLAUDE_MODEL=claude-sonnet-4-20250514
-CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+CLAUDE_MODEL=claude-sonnet-4-5-20250929
+CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
-OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
@@ -200,7 +200,7 @@ CCM_LANGUAGE=en
 # Deepseek
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 
-# GLM4.5 (智谱清言)
+# GLM4.6 (智谱清言)
 GLM_API_KEY=your-glm-api-key
 
 # KIMI2 (月之暗面)
@@ -222,12 +222,12 @@ KIMI_MODEL=kimi-k2-turbo-preview
 KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
-GLM_MODEL=glm-4.5
+GLM_MODEL=glm-4.6
 GLM_SMALL_FAST_MODEL=glm-4.5-air
-CLAUDE_MODEL=claude-sonnet-4-20250514
-CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+CLAUDE_MODEL=claude-sonnet-4-5-20250929
+CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
-OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514
+OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
@@ -343,11 +343,11 @@ switch_to_deepseek() {
 
 # 切换到Claude Sonnet
 switch_to_claude() {
-    echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Sonnet 4...${NC}"
+    echo -e "${YELLOW}🔄 切换到 Claude Sonnet 4.5...${NC}"
     clean_env
-    export ANTHROPIC_MODEL="claude-sonnet-4-20250514"
-    export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-20250514"
-    echo -e "${GREEN}✅ $(t 'switched_to') Claude Sonnet 4 ($(t 'using_pro_subscription'))${NC}"
+    export ANTHROPIC_MODEL="claude-sonnet-4-5-20250929"
+    export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-5-20250929"
+    echo -e "${GREEN}✅ 已切换到 Claude Sonnet 4.5 (使用 Claude Pro 订阅)${NC}"
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
@@ -357,24 +357,24 @@ switch_to_opus() {
     echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Opus 4.1...${NC}"
     clean_env
     export ANTHROPIC_MODEL="claude-opus-4-1-20250805"
-    export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-20250514"
-    echo -e "${GREEN}✅ $(t 'switched_to') Claude Opus 4.1 ($(t 'using_pro_subscription'))${NC}"
+    export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-5-20250929"
+    echo -e "${GREEN}✅ 已切换到 Claude Opus 4.1 (使用 Claude Pro 订阅)${NC}"
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
-# 切换到GLM4.5
+# 切换到GLM4.6
 switch_to_glm() {
-    echo -e "${YELLOW}🔄 $(t 'switching_to') GLM4.5 $(t 'model')...${NC}"
+    echo -e "${YELLOW}🔄 切换到 GLM4.6 模型...${NC}"
     clean_env
     if is_effectively_set "$GLM_API_KEY"; then
         export ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
         export ANTHROPIC_API_URL="https://open.bigmodel.cn/api/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$GLM_API_KEY"
         export ANTHROPIC_API_KEY="$GLM_API_KEY"
-        export ANTHROPIC_MODEL="glm-4.5"
-        export ANTHROPIC_SMALL_FAST_MODEL="glm-4.5"
-        echo -e "${GREEN}✅ $(t 'switched_to') GLM4.5（$(t 'official')）${NC}"
+        export ANTHROPIC_MODEL="glm-4.6"
+        export ANTHROPIC_SMALL_FAST_MODEL="glm-4.6"
+        echo -e "${GREEN}✅ 已切换到 GLM4.6（官方）${NC}"
     else
         echo -e "${RED}❌ $(t 'not_detected') GLM_API_KEY。$(t 'glm_official_only')${NC}"
         return 1
@@ -473,14 +473,14 @@ show_help() {
     echo "  eval \"\$(ccm deepseek)\"                   # Apply in current shell (recommended)"
     echo "  $(basename "$0") status                      # Check current status (masked)"
     echo ""
-    echo -e "${YELLOW}$(t 'supported_models'):${NC}"
-    echo "  🌙 KIMI2               - $(t 'official'): kimi-k2-turbo-preview"
-    echo "  🤖 Deepseek            - $(t 'deepseek_features')"
-    echo "  🐱 LongCat             - $(t 'longcat_features')"
-    echo "  🐪 Qwen                - $(t 'qwen_features')"
-    echo "  🇨🇳 GLM4.5             - $(t 'glm_features')"
-    echo "  🧠 Claude Sonnet 4     - $(t 'claude_sonnet_features')"
-    echo "  🚀 Claude Opus 4.1     - $(t 'claude_opus_features')"
+    echo -e "${YELLOW}支持的模型:${NC}"
+    echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
+    echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
+    echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
+    echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
+    echo "  🇨🇳 GLM4.6             - 官方：glm-4.6 / glm-4.5-air"
+    echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
+    echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
 }
 
 # 将缺失的模型ID覆盖项追加到配置文件（仅追加缺失项，不覆盖已存在的配置）
@@ -494,12 +494,12 @@ ensure_model_override_defaults() {
         "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
         "QWEN_MODEL=qwen3-max"
         "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct"
-        "GLM_MODEL=glm-4.5"
+        "GLM_MODEL=glm-4.6"
         "GLM_SMALL_FAST_MODEL=glm-4.5-air"
-        "CLAUDE_MODEL=claude-sonnet-4-20250514"
-        "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-20250514"
+        "CLAUDE_MODEL=claude-sonnet-4-5-20250929"
+        "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
         "OPUS_MODEL=claude-opus-4-1-20250805"
-        "OPUS_SMALL_FAST_MODEL=claude-sonnet-4-20250514"
+        "OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
     )
     local added_header=0
     for pair in "${pairs[@]}"; do
@@ -660,7 +660,7 @@ emit_env_exports() {
                 return 1
             fi
             ;;
-        "glm"|"glm4"|"glm4.5")
+        "glm"|"glm4"|"glm4.6")
             if is_effectively_set "$GLM_API_KEY"; then
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
@@ -669,7 +669,7 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/anthropic'"
                 echo "if [ -z \"\${GLM_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${GLM_API_KEY}\""
-local glm_model="${GLM_MODEL:-glm-4.5}"
+                local glm_model="${GLM_MODEL:-glm-4.6}"
                 local glm_small="${GLM_SMALL_FAST_MODEL:-glm-4.5-air}"
                 echo "export ANTHROPIC_MODEL='${glm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${glm_small}'"
@@ -684,8 +684,8 @@ local glm_model="${GLM_MODEL:-glm-4.5}"
             echo "unset ANTHROPIC_BASE_URL"
             echo "unset ANTHROPIC_API_URL"
             echo "unset ANTHROPIC_API_KEY"
-            local claude_model="${CLAUDE_MODEL:-claude-sonnet-4-20250514}"
-            local claude_small="${CLAUDE_SMALL_FAST_MODEL:-claude-sonnet-4-20250514}"
+            local claude_model="${CLAUDE_MODEL:-claude-sonnet-4-5-20250929}"
+            local claude_small="${CLAUDE_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
             echo "export ANTHROPIC_MODEL='${claude_model}'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='${claude_small}'"
             ;;
@@ -695,7 +695,7 @@ local glm_model="${GLM_MODEL:-glm-4.5}"
             echo "unset ANTHROPIC_API_URL"
             echo "unset ANTHROPIC_API_KEY"
             local opus_model="${OPUS_MODEL:-claude-opus-4-1-20250805}"
-            local opus_small="${OPUS_SMALL_FAST_MODEL:-claude-sonnet-4-20250514}"
+            local opus_small="${OPUS_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
             echo "export ANTHROPIC_MODEL='${opus_model}'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='${opus_small}'"
             ;;
@@ -712,7 +712,7 @@ local glm_model="${GLM_MODEL:-glm-4.5}"
                 echo "export ANTHROPIC_API_URL='https://api.longcat.chat/anthropic'"
                 echo "if [ -z \"\${LONGCAT_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${LONGCAT_API_KEY}\""
-local lc_model="${LONGCAT_MODEL:-LongCat-Flash-Thinking}"
+                local lc_model="${LONGCAT_MODEL:-LongCat-Flash-Thinking}"
                 local lc_small="${LONGCAT_SMALL_FAST_MODEL:-LongCat-Flash-Chat}"
                 echo "export ANTHROPIC_MODEL='${lc_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${lc_small}'"
@@ -750,7 +750,7 @@ main() {
         "longcat"|"lc")
             emit_env_exports longcat
             ;;
-        "glm"|"glm4"|"glm4.5")
+        "glm"|"glm4"|"glm4.6")
             emit_env_exports glm
             ;;
         "claude"|"sonnet"|"s")
