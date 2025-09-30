@@ -39,6 +39,22 @@ ccm status
 
 Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secrets are masked in status. Recommend chmod 600 ~/.ccm_config
 
+## 🎯 Quick Experience (30 seconds)
+
+Want to try immediately without any configuration? Just install and use DeepSeek 3.1:
+
+```bash
+# 1. Install
+chmod +x install.sh ccm.sh && ./install.sh
+source ~/.zshrc
+
+# 2. Use DeepSeek 3.1 immediately (no config needed!)
+ccm deepseek
+ccm status
+```
+
+✨ **Magic Feature**: CCM includes a built-in DeepSeek 3.1 experience key that works with PPINFRA service. No API key configuration required for immediate testing!
+
 ## 🌟 Features
 
 - 🤖 **Multi-model Support**: Claude, Deepseek, KIMI, GLM, Qwen and other mainstream AI models
@@ -217,6 +233,19 @@ ccm status
    SMALL_MODEL: qwen3-next-80b-a3b-instruct
 ```
 
+### Current Shell Activation (Recommended)
+
+To apply model settings to your current shell session only, use the env subcommand which outputs export statements without printing secret values:
+
+```bash
+# Apply model environment to current shell
+eval "$(ccm env deepseek)"
+# Verify
+ccm status
+```
+
+This approach is recommended for temporary use or testing, as it only affects the current shell session.
+
 ## 🛠️ Install (adds ccm function to rc)
 
 CCM supports safe one-step installation without modifying your shell configuration files.
@@ -320,7 +349,7 @@ CLAUDE_API_KEY=your-claude-key
 ### Common Issues
 
 **Q: Getting "XXX_API_KEY not detected" error**
-```bash
+``bash
 A: Check if the corresponding API key is correctly configured in ~/.ccm_config
    ./ccm.sh config  # Open config file to check
 ```

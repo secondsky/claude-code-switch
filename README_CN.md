@@ -4,9 +4,39 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
-[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/yourusername/claude-code-switch)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/foreveryh/claude-code-switch)
 
-## 🚀 一分钟上手（最简）
+## 前提
+
+使用本工具前，需要先完成以下准备工作：
+
+1. 安装 Claude Code：
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+2. 克隆当前项目：
+```bash
+git clone https://github.com/foreveryh/claude-code-switch.git
+cd claude-code-switch
+```
+
+## 🎯 快速体验ClaudeCode（30秒零配置）
+
+想立即体验而无需任何配置？只需安装并使用 DeepSeek 3.1：
+
+```bash
+# 1. 安装
+chmod +x install.sh ccm.sh && ./install.sh
+source ~/.zshrc
+
+# 2. 立即使用 DeepSeek 3.1（无需配置！）
+ccm deepseek
+ccm status
+claude
+```
+
+# 🚀 一分钟上手（配置自己的 KEY）
 
 - 安装（不修改 zshrc）
 ```bash
@@ -16,8 +46,8 @@ chmod +x install.sh ccm.sh && ./install.sh
 - 配置（环境变量 > 配置文件）
 ```bash
 # 方式A：创建/编辑配置文件
-ccm            # 首次运行会生成 ~/.ccm_config
-ccm config     # 打开编辑
+./ccm.sh            # 首次运行会生成 ~/.ccm_config
+./ccm.sh config     # 打开编辑
 
 # 方式B：设置环境变量（优先级最高）
 export DEEPSEEK_API_KEY=sk-...
@@ -26,7 +56,7 @@ export LONGCAT_API_KEY=your-longcat-api-key
 
 - 使用（当前 shell 生效）
 ```bash
-eval "$(ccm env deepseek)"
+eval "$(./ccm.sh env deepseek)"
 ccm status
 ```
 
@@ -36,6 +66,7 @@ ccm status
 ```
 
 说明：不会修改 ~/.zshrc；status 输出已脱敏；建议为 ~/.ccm_config 设置 600 权限
+
 
 ## 🌟 特性
 
@@ -51,7 +82,7 @@ ccm status
 | 模型 | 官方支持 | 备用支持(PPINFRA) | 特色 |
 |------|---------|------------------|------|
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | 长文本处理 |
-| 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
+| 🤖 **Deepseek** | ✅ Deepseek-v3.2 | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ❌ 仅官方 | 智谱清言 |
@@ -152,7 +183,7 @@ ccm help
 ### 在当前 shell 生效（推荐）
 
 使用 env 子命令，只输出 export 语句，不打印密钥明文：
-```bash
+``bash
 # 将模型环境导出到当前 shell
 eval "$(ccm env deepseek)"
 # 验证
@@ -170,7 +201,7 @@ ccm status
 
 ### 实际使用示例
 
-```bash
+```
 # 切换到KIMI进行长文本处理
 $ ./ccm.sh kimi
 🔄 切换到 KIMI2 模型...
@@ -244,17 +275,6 @@ CCM 使用智能的分层配置系统：
    - 仅在对应环境变量未设置时使用
    - 适合日常开发使用
 
-**实际场景示例：**
-```bash
-# 存在环境变量
-export DEEPSEEK_API_KEY=env-key-123
-
-# 配置文件中包含
-echo "DEEPSEEK_API_KEY=config-key-456" >> ~/.ccm_config
-
-# CCM 将使用：env-key-123（环境变量胜出）
-./ccm.sh status  # 显示 DEEPSEEK_API_KEY: env-key-123
-```
 
 ### 智能备用机制
 
@@ -339,7 +359,7 @@ env | grep ANTHROPIC
 欢迎提交Issue和Pull Request！
 
 ### 开发设置
-```bash
+``bash
 git clone https://github.com/yourusername/claude-code-switch.git
 cd claude-code-switch
 ```

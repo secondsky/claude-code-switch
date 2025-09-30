@@ -133,8 +133,6 @@ OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
-# 备用提供商（仅当且仅当官方密钥未提供时启用）
-PPINFRA_API_KEY=your-ppinfra-api-key  # https://api.ppinfra.com/openai/v1/anthropic
 EOF
         echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}"
         echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}"
@@ -231,8 +229,6 @@ OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
-# 备用提供商（仅当且仅当官方密钥未提供时启用）
-PPINFRA_API_KEY=your-ppinfra-api-key  # https://api.ppinfra.com/openai/v1/anthropic
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}"
     echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}"
@@ -334,8 +330,15 @@ switch_to_deepseek() {
         export ANTHROPIC_SMALL_FAST_MODEL="deepseek/deepseek-v3.1"
         echo -e "${GREEN}✅ $(t 'switched_to') Deepseek（$(t 'ppinfra_backup')）${NC}"
     else
-        echo -e "${RED}❌ $(t 'not_detected') DEEPSEEK_API_KEY，$(t 'and') PPINFRA_API_KEY $(t 'not_configured')，$(t 'cannot_switch')${NC}"
-        return 1
+        # 隐藏彩蛋：默认 DeepSeek 3.1 体验密钥（经过混淆处理）
+        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/openai/v1/anthropic"
+        export ANTHROPIC_API_URL="https://api.ppinfra.com/openai/v1/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
+        export ANTHROPIC_API_KEY="$hidden_key"
+        export ANTHROPIC_MODEL="deepseek/deepseek-v3.1"
+        export ANTHROPIC_SMALL_FAST_MODEL="deepseek/deepseek-v3.1"
+        echo -e "${GREEN}✅ $(t 'switched_to') Deepseek（$(t 'default_experience_key')）${NC}"
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -596,8 +599,18 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${ds_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
             else
-                echo "# ❌ $(t 'not_detected') DEEPSEEK_API_KEY $(t 'or') PPINFRA_API_KEY" 1>&2
-                return 1
+                # 隐藏彩蛋：默认 DeepSeek 3.1 体验密钥，为了方便各位体验，但这个有RPM的限制，需要的话可以在 README.md 里找到 PPINFA 的注册入口
+                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/openai/v1/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/openai/v1/anthropic'"
+                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
+                local ds_model="${DEEPSEEK_MODEL:-deepseek/deepseek-v3.1}"
+                local ds_small="${DEEPSEEK_SMALL_FAST_MODEL:-deepseek/deepseek-v3.1}"
+                echo "export ANTHROPIC_MODEL='${ds_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
             fi
             ;;
         "kimi"|"kimi2")

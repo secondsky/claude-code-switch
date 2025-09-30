@@ -53,5 +53,6 @@
   "using_pro_subscription": "using Claude Pro subscription",
   "alibaba_dashscope_official": "Alibaba Cloud DashScope official",
   "configure_api_key": "Please configure",
-  "api_key": "API key"
+  "api_key": "API key",
+  "default_experience_key": "default experience key"
 }
