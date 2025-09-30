@@ -54,9 +54,17 @@ ccm status
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
-| 🇨🇳 **GLM4.6** | ✅ glm-4-plus | ❌ 仅官方 | 智谱清言 |
+| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ❌ 仅官方 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
+
+> 💰 **PPINFRA 备用服务注册**
+>
+> 注册PPINFRA服务可获得 **15元代金券**：
+> - **注册链接**：https://ppio.com/user/register?invited_by=ZQRQZZ
+> - **邀请码**：`ZQRQZZ`
+>
+> PPINFRA为Deepseek、KIMI和Qwen模型提供可靠的备用服务，当官方API不可用时自动切换。
 
 ## 🚀 快速开始
 

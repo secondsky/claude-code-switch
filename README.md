@@ -56,9 +56,17 @@ Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secret
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
-| 🇨🇳 **GLM4.6** | ✅ glm-4-plus | ❌ Official only | Zhipu AI |
+| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ❌ Official only | Zhipu AI |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
+
+> 💰 **PPINFRA Fallback Service Registration**
+>
+> Get **¥15 voucher** when registering PPINFRA service:
+> - **Registration Link**: https://ppio.com/user/register?invited_by=ZQRQZZ
+> - **Invitation Code**: `ZQRQZZ`
+>
+> PPINFRA provides reliable fallback service for Deepseek, KIMI, and Qwen models when official APIs are unavailable.
 
 ## 🚀 Quick Start
 
