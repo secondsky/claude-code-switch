@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Uninstaller for Claude Code Model Switcher (CCM)
-# - Removes the ccm() function block from your shell rc files
+# - Removes the ccm() and ccc() function blocks from your shell rc files
 # - Does NOT remove any binaries or modify PATH
 
 BEGIN_MARK="# >>> ccm function begin >>>"
@@ -19,13 +19,21 @@ remove_block() {
       $0==e {inblock=0; next}
       !inblock {print}
     ' "$rc" > "$tmp" && mv "$tmp" "$rc"
-    echo "🗑️  Removed ccm function from: $rc"
+    echo "🗑️  Removed ccm and ccc functions from: $rc"
   fi
 }
 
 main() {
   remove_block "$HOME/.zshrc"
   remove_block "$HOME/.bashrc"
+
+  # Remove installed ccm assets from user data dir
+  local install_dir="${XDG_DATA_HOME:-$HOME/.local/share}/ccm"
+  if [[ -d "$install_dir" ]]; then
+    rm -rf "$install_dir"
+    echo "🗑️  Removed installed ccm assets at: $install_dir"
+  fi
+
   echo "✅ Uninstall complete. Reload your shell or run: source ~/.zshrc (or ~/.bashrc)"
 }
 

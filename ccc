@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Claude Code Commander (ccc)
+# Repo-local launcher: switch model via ccm.sh and then exec `claude`
+# This affects only the spawned `claude` process, not your parent shell.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+CCM_CMD_DEFAULT="$SCRIPT_DIR/ccm.sh"
+CCM="${CCM_CMD:-$CCM_CMD_DEFAULT}"
+
+usage() {
+    cat <<EOF
+Usage: ./ccc <model> [claude-options]
+       ./ccc pp <model> [claude-options]
+
+Examples:
+  ./ccc deepseek                     # Launch Claude Code with DeepSeek
+  ./ccc pp glm                       # Launch with PPINFRA GLM
+  ./ccc kimi --dangerously-skip-permissions  # Pass options to Claude Code
+
+Available models:
+  Official: deepseek, glm, kimi, qwen, claude, opus, longcat
+  PPINFRA:  pp deepseek | pp glm | pp kimi | pp qwen
+EOF
+}
+
+if [[ ! -f "$CCM" ]]; then
+    echo "ccc error: cannot find ccm CLI at $CCM" >&2
+    echo "Hint: ensure ccm.sh exists next to this script, or set CCM_CMD=/path/to/ccm.sh" >&2
+    exit 1
+fi
+
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+use_pp=false
+model=""
+
+if [[ "${1:-}" == "pp" ]]; then
+    use_pp=true
+    shift || true
+fi
+
+if [[ $# -lt 1 ]]; then
+    usage
+    exit 1
+fi
+
+model="$1"
+shift || true
+
+# Remaining args are passed through to `claude`
+claude_args=("$@")
+
+# Configure environment for this process using repo-local ccm
+if $use_pp; then
+    # pass no_color=true so status messages go to stderr and exports are clean on stdout
+    eval "$("$CCM" pp "$model" true)"
+else
+    eval "$("$CCM" "$model")"
+fi
+
+# Friendly status
+echo ""
+echo "🚀 Launching Claude Code..."
+echo "   Model: ${ANTHROPIC_MODEL:-'(unset)'}"
+echo "   Base URL: ${ANTHROPIC_BASE_URL:-'Default (Anthropic)'}"
+
+# Ensure `claude` is available
+if ! command -v claude >/dev/null 2>&1; then
+    echo "❌ 'claude' CLI not found. Install it first: npm install -g @anthropic-ai/claude-code" >&2
+    exit 127
+fi
+
+# Exec into Claude Code with the configured environment
+if [[ ${#claude_args[@]} -eq 0 ]]; then
+    exec claude
+else
+    exec claude "${claude_args[@]}"
+fi

@@ -54,5 +54,13 @@
   "alibaba_dashscope_official": "Alibaba Cloud DashScope official",
   "configure_api_key": "Please configure",
   "api_key": "API key",
-  "default_experience_key": "default experience key"
+  "default_experience_key": "default experience key",
+  "ppinfra_model_selection": "PPINFRA Model Selection",
+  "select_model_number": "Select model number",
+  "invalid_selection": "Invalid selection",
+  "unknown_ppinfra_model": "Unknown PPINFRA model",
+  "available_ppinfra_models": "Available PPINFRA models",
+  "configure_ppinfra_key": "Please configure PPINFRA_API_KEY in your config file",
+  "selection_cancelled": "Selection cancelled",
+  "valid_options": "Valid options"
 }

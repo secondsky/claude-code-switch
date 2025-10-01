@@ -10,7 +10,21 @@
 
 ## 🚀 Quick Start (60 seconds)
 
-- Install (adds ccm function to your shell rc)
+- Zero-config (no install; run from repo)
+```bash
+# Clone and enter the project
+git clone https://github.com/yourusername/claude-code-switch.git
+cd claude-code-switch
+
+# One-command launch (does not modify your shell)
+./ccc deepseek                    # Switch env for the spawned Claude Code only and launch it
+
+# Or manage environment without installing (current shell only)
+./ccm status                      # View current (masked) status
+eval "$(./ccm env deepseek)"      # Apply env to current shell
+```
+
+- Install (adds ccm and ccc functions to your shell rc)
 ```bash
 chmod +x install.sh ccm.sh && ./install.sh
 source ~/.zshrc  # reload current shell
@@ -28,8 +42,13 @@ export DEEPSEEK_API_KEY=sk-...
 
 - Use (after install)
 ```bash
+# Switch models in current terminal
 ccm deepseek   # or: ccm ds / ccm kimi / ccm qwen / ccm glm / ccm claude / ccm opus
 ccm status
+
+# Or switch and launch Claude Code in one command
+ccc deepseek   # switches to DeepSeek and launches Claude Code
+ccc pp glm     # switches to PPINFRA GLM and launches Claude Code
 ```
 
 - Uninstall
@@ -37,7 +56,7 @@ ccm status
 ./uninstall.sh
 ```
 
-Notes: installer adds a ccm() function into your ~/.zshrc (or ~/.bashrc). Secrets are masked in status. Recommend chmod 600 ~/.ccm_config
+Notes: installer adds ccm() and ccc() functions into your ~/.zshrc (or ~/.bashrc). Secrets are masked in status. Recommend chmod 600 ~/.ccm_config
 
 ## 🎯 Quick Experience (30 seconds)
 
@@ -60,6 +79,7 @@ ccm status
 - 🤖 **Multi-model Support**: Claude, Deepseek, KIMI, GLM, Qwen and other mainstream AI models
 - 🔄 **Smart Fallback Mechanism**: Official API priority with automatic fallback to PPINFRA backup service
 - ⚡ **Quick Switching**: One-click switching between different AI models to boost productivity
+- 🚀 **One-Command Launch**: `ccc` command switches model and launches Claude Code in a single step
 - 🎨 **Colorful Interface**: Intuitive command-line interface with clear switching status display
 - 🛡️ **Secure Configuration**: Independent configuration file for API key management, multi-editor support
 - 📊 **Status Monitoring**: Real-time display of current model configuration and key status
@@ -69,10 +89,10 @@ ccm status
 | Model | Official Support | Fallback Support(PPINFRA) | Features |
 |-------|------------------|---------------------------|----------|
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | Long text processing |
-| 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.1 | Cost-effective reasoning |
+| 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
-| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ❌ Official only | Zhipu AI |
+| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 
@@ -82,7 +102,7 @@ ccm status
 > - **Registration Link**: https://ppio.com/user/register?invited_by=ZQRQZZ
 > - **Invitation Code**: `ZQRQZZ`
 >
-> PPINFRA provides reliable fallback service for Deepseek, KIMI, and Qwen models when official APIs are unavailable.
+> PPINFRA provides reliable fallback service for Deepseek, KIMI, Qwen, and GLM models when official APIs are unavailable.
 
 ## 🚀 Quick Start
 
@@ -161,17 +181,50 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 
 ## 📖 Usage
 
+### Two Ways to Use CCM
+
+**Method 1: `ccm` - Environment Management Only**
+```bash
+# Switch models in your current terminal session
+ccm deepseek      # Switch to DeepSeek
+ccm glm           # Switch to GLM4.6
+ccm pp kimi       # Switch to PPINFRA KIMI
+
+# Then manually launch Claude Code
+claude
+```
+
+**Method 2: `ccc` - One-Command Launch (Recommended)**
+```bash
+# Switch model and launch Claude Code in one step
+ccc deepseek                            # Launch with DeepSeek
+ccc pp glm                              # Launch with PPINFRA GLM
+ccc kimi --dangerously-skip-permissions # Launch KIMI with options
+```
+
 ### Basic Commands
 
 ```bash
-# Switch to different models
+# Switch to different models (ccm)
 ccm kimi          # Switch to KIMI2
-ccm deepseek      # Switch to Deepseek  
+ccm deepseek      # Switch to Deepseek
 ccm qwen          # Switch to Qwen
 ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
 ccm claude        # Switch to Claude Sonnet 4.5
 ccm opus          # Switch to Claude Opus 4.1
+
+# Switch to PPINFRA service (explicit fallback)
+ccm pp            # Interactive PPINFRA model selection
+ccm pp deepseek   # Direct switch to PPINFRA DeepSeek
+ccm pp glm        # Direct switch to PPINFRA GLM
+ccm pp kimi       # Direct switch to PPINFRA KIMI
+ccm pp qwen       # Direct switch to PPINFRA Qwen
+
+# Launch Claude Code with model switching (ccc)
+ccc deepseek      # Switch to DeepSeek and launch
+ccc pp glm        # Switch to PPINFRA GLM and launch
+ccc opus          # Switch to Claude Opus and launch
 
 # View current status (masked)
 ccm status
@@ -181,6 +234,7 @@ ccm config
 
 # Show help
 ccm help
+ccc              # Show ccc usage help
 ```
 
 ### Official keys are required (and model IDs are configurable)
@@ -196,14 +250,20 @@ Placeholders like `your-xxx-api-key` or empty values are treated as not configur
 ### Command Shortcuts
 
 ```bash
+# ccm shortcuts
 ccm ds           # Short for deepseek
 ccm s            # Short for claude sonnet  
 ccm o            # Short for opus
 ccm st           # Short for status
+
+# ccc shortcuts (same model names)
+ccc ds           # Launch with DeepSeek
+ccc pp ds        # Launch with PPINFRA DeepSeek
 ```
 
 ### Usage Examples
 
+**Example 1: Using ccm (environment management only)**
 ```bash
 # Switch to KIMI for long text processing
 ccm kimi
@@ -214,6 +274,33 @@ ccm status
    MODEL: kimi-k2-turbo-preview
    SMALL_MODEL: kimi-k2-turbo-preview
 
+# Then manually launch Claude Code
+claude
+```
+
+**Example 2: Using ccc (one-command launch - recommended)**
+```bash
+# Switch to DeepSeek and launch Claude Code immediately
+ccc deepseek
+🔄 Switching to deepseek...
+✅ Environment configured for: DeepSeek
+
+🚀 Launching Claude Code...
+   Model: deepseek-chat
+   Base URL: https://api.deepseek.com/anthropic
+
+# Switch to PPINFRA GLM and launch with options
+ccc pp glm --dangerously-skip-permissions
+🔄 Switching to PPINFRA glm...
+✅ Environment configured for: GLM (PPINFRA)
+
+🚀 Launching Claude Code...
+   Model: zai-org/glm-4.6
+   Base URL: https://api.ppinfra.com/anthropic
+```
+
+**Example 3: Advanced workflows**
+```bash
 # Switch to Deepseek for code generation
 ccm ds
 ccm status
@@ -231,6 +318,15 @@ ccm status
    AUTH_TOKEN: [Set]
    MODEL: qwen3-max
    SMALL_MODEL: qwen3-next-80b-a3b-instruct
+
+# Switch to PPINFRA service explicitly
+ccm pp deepseek
+ccm status
+📊 Current model configuration:
+   BASE_URL: https://api.ppinfra.com/anthropic
+   AUTH_TOKEN: [Set]
+   MODEL: deepseek/deepseek-v3.2-exp
+   SMALL_MODEL: deepseek/deepseek-v3.2-exp
 ```
 
 ### Current Shell Activation (Recommended)
@@ -246,7 +342,7 @@ ccm status
 
 This approach is recommended for temporary use or testing, as it only affects the current shell session.
 
-## 🛠️ Install (adds ccm function to rc)
+## 🛠️ Install (adds ccm and ccc functions to rc)
 
 CCM supports safe one-step installation without modifying your shell configuration files.
 
@@ -257,7 +353,9 @@ chmod +x install.sh ccm.sh
 ./install.sh
 ```
 
-- Writes a `ccm()` function block into your rc (zsh preferred, bash fallback)
+- Writes `ccm()` and `ccc()` function blocks into your rc (zsh preferred, bash fallback)
+- `ccm`: Environment management - switches models in current terminal
+- `ccc`: One-command launcher - switches model and launches Claude Code
 - Does NOT copy binaries or modify PATH
 - Idempotent: re-running install replaces the previous block
 
@@ -319,11 +417,12 @@ Qwen models are now officially integrated with Alibaba Cloud DashScope:
 ### PPINFRA Fallback Service
 
 PPINFRA is a third-party AI model aggregation service providing:
-- Base URL: `https://api.ppinfra.com/openai/v1/anthropic`
+- Base URL: `https://api.ppinfra.com/anthropic`
 - Supported models:
   - `kimi-k2-turbo-preview` (KIMI fallback)
-  - `deepseek/deepseek-v3.1` (Deepseek fallback)
+  - `deepseek/deepseek-v3.2-exp` (Deepseek fallback)
   - `qwen3-next-80b-a3b-thinking` (Qwen fallback)
+  - `zai-org/glm-4.6` (GLM fallback)
 
 ### Configuration File Details
 

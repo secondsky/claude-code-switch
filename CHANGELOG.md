@@ -1,84 +1,77 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## [2.0.0] - 2025-10-01
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [1.0.0] - 2025-01-27
-
-### Added
-- 🎉 Initial release of Claude Code Model Switcher (CCM)
-- 🤖 Multi-model support for Claude, Deepseek, KIMI, GLM, Qwen
-- 🔄 Smart fallback mechanism with PPINFRA backup service
-- ⚡ Quick model switching with one-click commands
-- 🎨 Colorful command-line interface with clear status display
-- 🛡️ Secure configuration file management (`~/.ccm_config`)
-- 📊 Real-time status monitoring and key validation
-- 🔧 Support for both official APIs and fallback services
-
-### Features
-- **KIMI2**: Official moonshot-v1-128k + PPINFRA moonshotai/kimi-k2-0905 fallback
-- **Deepseek**: Official deepseek-chat + PPINFRA deepseek/deepseek-v3.1 fallback
-- **Qwen**: Custom endpoint support + PPINFRA qwen3-next-80b-a3b-thinking fallback
-- **GLM4.6**: Official glm-4-plus (official only)
-- **Claude Sonnet 4.5**: Official claude-sonnet-4-5-20250929 (official only)
-- **Claude Opus 4.1**: Official claude-opus-4-1-20250805 (official only)
-
-### Commands
-- `./ccm.sh kimi` - Switch to KIMI2
-- `./ccm.sh deepseek` (or `ds`) - Switch to Deepseek
-- `./ccm.sh qwen` - Switch to Qwen
-- `./ccm.sh glm` - Switch to GLM4.6
-- `./ccm.sh claude` (or `s`) - Switch to Claude Sonnet 4
-- `./ccm.sh opus` (or `o`) - Switch to Claude Opus 4.1
-- `./ccm.sh status` (or `st`) - Show current configuration
-- `./ccm.sh config` - Edit configuration file
-- `./ccm.sh help` - Show help information
-
-### Configuration
-- Automatic creation of `~/.ccm_config` on first run
-- Support for multiple API keys per service
-- Intelligent fallback when official keys are missing
-- Editor auto-detection for configuration editing
-
-### Documentation
-- Comprehensive README in both English and Chinese
-- Detailed usage examples and configuration guides
-- Troubleshooting section with common issues
-- MIT License for open source distribution
-
-## [1.1.0] - 2025-09-25
+### Added - Plan B Implementation
+- ✨ **New `ccc` command**: One-command launcher that switches model and starts Claude Code
+  - `ccc deepseek` - Switch to DeepSeek and launch
+  - `ccc pp glm` - Switch to PPINFRA GLM and launch
+  - Supports all Claude Code options (e.g., `--dangerously-skip-permissions`)
+- 🔄 Enhanced `ccm` command: Improved environment management
+  - Simplified `ccm pp` handling with unified eval logic
+  - Better environment variable propagation
+- 📦 Improved installer: Now installs both `ccm()` and `ccc()` functions
 
 ### Changed
-- 🔄 **Qwen Integration Update**: Migrated to Alibaba Cloud DashScope official endpoint
-  - Updated base URL to `https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy`
-  - Changed default model from `qwen-max` to `qwen3-max`
-  - Updated small model from `qwen-max` to `qwen3-next-80b-a3b-instruct`
-  - Removed dependency on custom `QWEN_ANTHROPIC_BASE_URL` configuration
-  - Simplified configuration using standard `sk-` prefixed API keys
+- 🏗️ **Major refactor**: Consolidated all functionality into `ccm.sh` and `install.sh`
+- 🎨 Improved user experience with two workflow options:
+  - **Method 1**: `ccm` for environment management only
+  - **Method 2**: `ccc` for one-command launch (recommended)
+- 📝 Updated all documentation to reflect Plan B design
+- 🧹 Cleaned up project structure (removed 16 obsolete files)
 
-### Updated
-- 📝 Configuration templates now use latest Qwen model identifiers
-- 🛠️ Help text updated to reflect new Qwen capabilities
-- 🔧 Maintained backward compatibility with PPINFRA fallback service
+### Removed
+- Deprecated scripts (functionality integrated into main scripts):
+  - `ccm_pp_source.sh` - Integrated into `ccm.sh`
+  - `claude-pp.sh` - Replaced by `ccc` function
+  - `ccm_pp.sh` - No longer needed
+- Obsolete test scripts (moved to backup)
 
-### Security
-- 🔒 Ensured no API keys are committed to repository
-- 📋 Removed temporary documentation files containing sensitive information
+### Fixed
+- 修复 `ccm pp` 命令环境变量不生效的问题
+- 修复 GLM 模型版本配置（从 4.5 升级到 4.6）
+- Fixed PPINFRA API endpoint (removed duplicate `/v1`)
+- Fixed authentication conflicts (use only `ANTHROPIC_AUTH_TOKEN`)
 
-## [Unreleased]
+---
 
-### Changed
-- 🌙 **KIMI2**: Updated default endpoint to `https://api.moonshot.cn/anthropic` and default model to `kimi-k2-turbo-preview`
-- 🗝️ Configuration examples now reference `your-moonshot-api-key` for Moonshot credentials
+## Usage Examples
 
-### Planned
-- [ ] Add support for more AI models (Anthropic, Google Gemini, etc.)
-- [ ] Configuration validation and health checks
-- [ ] Interactive configuration setup wizard
-- [ ] Batch operation support
-- [ ] Custom model endpoint configuration
-- [ ] Usage statistics and analytics
-- [ ] Plugin system for extensibility
-- [ ] Web interface for configuration management
+### Quick Start with ccc (Recommended)
+
+```bash
+# Switch to DeepSeek and launch Claude Code in one command
+ccc deepseek
+
+# Use PPINFRA service
+ccc pp glm
+
+# With Claude Code options
+ccc kimi --dangerously-skip-permissions
+```
+
+### Traditional ccm Workflow
+
+```bash
+# Switch environment
+ccm pp deepseek
+
+# Verify
+ccm status
+
+# Then launch Claude Code manually
+claude
+```
+
+### Verify Configuration
+
+```bash
+# Check current settings
+ccm status
+
+# Should display:
+# 📊 Current model configuration:
+#    BASE_URL: https://api.ppinfra.com/anthropic
+#    AUTH_TOKEN: [Set]
+#    MODEL: deepseek/deepseek-v3.2-exp
+```

@@ -21,19 +21,22 @@ git clone https://github.com/foreveryh/claude-code-switch.git
 cd claude-code-switch
 ```
 
-## 🎯 快速体验ClaudeCode（30秒零配置）
+## 🎯 快速体验（克隆后立即可用）
 
-想立即体验而无需任何配置？只需安装并使用 DeepSeek 3.1：
+无需安装，直接在仓库目录中使用：
 
 ```bash
-# 1. 安装
+./ccc deepseek                      # 一步切换并启动 Claude Code（不修改你的 shell）
+
+# 或仅在“当前 shell”应用环境变量：
+./ccm status
+eval "$(./ccm env deepseek)"
+```
+
+可选：全局安装 ccm/ccc 函数（便于在任意目录使用）：
+```bash
 chmod +x install.sh ccm.sh && ./install.sh
 source ~/.zshrc
-
-# 2. 立即使用 DeepSeek 3.1（无需配置！）
-ccm deepseek
-ccm status
-claude
 ```
 
 # 🚀 一分钟上手（配置自己的 KEY）
@@ -82,10 +85,10 @@ ccm status
 | 模型 | 官方支持 | 备用支持(PPINFRA) | 特色 |
 |------|---------|------------------|------|
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | 长文本处理 |
-| 🤖 **Deepseek** | ✅ Deepseek-v3.2 | ✅ deepseek/deepseek-v3.1 | 高性价比推理 |
+| 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
-| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ❌ 仅官方 | 智谱清言 |
+| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
 
@@ -95,7 +98,7 @@ ccm status
 > - **注册链接**：https://ppio.com/user/register?invited_by=ZQRQZZ
 > - **邀请码**：`ZQRQZZ`
 >
-> PPINFRA为Deepseek、KIMI和Qwen模型提供可靠的备用服务，当官方API不可用时自动切换。
+> PPINFRA为Deepseek、KIMI、Qwen和GLM模型提供可靠的备用服务，当官方API不可用时自动切换。
 
 ## 🚀 快速开始
 
@@ -163,12 +166,19 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 ```bash
 # 切换到不同模型
 ccm kimi          # 切换到KIMI2
-ccm deepseek      # 切换到Deepseek  
+ccm deepseek      # 切换到Deepseek
 ccm qwen          # 切换到Qwen
 ccm glm           # 切换到GLM4.6
 ccm longcat       # 切换到LongCat
 ccm claude        # 切换到Claude Sonnet 4.5
 ccm opus          # 切换到Claude Opus 4.1
+
+# 切换到PPINFRA服务（显式备用）
+ccm pp            # 交互式PPINFRA模型选择
+ccm pp deepseek   # 直接切换到PPINFRA DeepSeek
+ccm pp glm        # 直接切换到PPINFRA GLM
+ccm pp kimi       # 直接切换到PPINFRA KIMI
+ccm pp qwen       # 直接切换到PPINFRA Qwen
 
 # 查看当前状态（脱敏）
 ccm status
@@ -213,13 +223,13 @@ $ ./ccm.sh kimi
 $ ./ccm.sh deepseek  
 🔄 切换到 Deepseek 模型...
 ✅ 已切换到 Deepseek（PPINFRA 备用）
-   BASE_URL: https://api.ppinfra.com/openai/v1/anthropic
+   BASE_URL: https://api.ppinfra.com/anthropic
    MODEL: deepseek/deepseek-v3.1
 
 # 查看当前配置状态
 $ ./ccm.sh status
 📊 当前模型配置:
-   BASE_URL: https://api.ppinfra.com/openai/v1/anthropic
+   BASE_URL: https://api.ppinfra.com/anthropic
    AUTH_TOKEN: [已设置]
    MODEL: deepseek/deepseek-v3.1
    SMALL_MODEL: deepseek/deepseek-v3.1
@@ -230,6 +240,13 @@ $ ./ccm.sh status
    DEEPSEEK_API_KEY: [未设置]
    QWEN_API_KEY: [未设置]
    PPINFRA_API_KEY: [已设置]
+
+# 显式切换到PPINFRA服务
+$ ./ccm.sh pp deepseek
+🔄 切换到 DeepSeek v3.2-exp（PPINFRA）
+   BASE_URL: https://api.ppinfra.com/anthropic
+   MODEL: deepseek/deepseek-v3.2-exp
+   SMALL_MODEL: deepseek/deepseek-v3.2-exp
 ```
 
 ## 🛠️ 安装（不修改 zshrc）
@@ -292,11 +309,12 @@ CCM实现了智能的备用机制：
 ### PPINFRA备用服务
 
 PPINFRA是一个第三方AI模型聚合服务，提供：
-- Base URL: `https://api.ppinfra.com/openai/v1/anthropic`
+- Base URL: `https://api.ppinfra.com/anthropic`
 - 支持模型：
   - `kimi-k2-turbo-preview` (KIMI备用)
-  - `deepseek/deepseek-v3.1` (Deepseek备用)
+  - `deepseek/deepseek-v3.2-exp` (Deepseek备用)
   - `qwen3-next-80b-a3b-thinking` (Qwen备用)
+  - `zai-org/glm-4.6` (GLM备用)
 
 ### 配置文件详解
 

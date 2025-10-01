@@ -8,6 +8,9 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SCRIPT_PATH="$SCRIPT_DIR/ccm.sh"
+# Install destination (stable per-user location)
+INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/ccm"
+DEST_SCRIPT_PATH="$INSTALL_DIR/ccm.sh"
 BEGIN_MARK="# >>> ccm function begin >>>"
 END_MARK="# <<< ccm function end <<<"
 
@@ -52,19 +55,93 @@ append_function_block() {
 $BEGIN_MARK
 # CCM: define a shell function that applies exports to current shell
 ccm() {
-  local script="$SCRIPT_PATH"
+  local script="$DEST_SCRIPT_PATH"
+  # Fallback search if the installed script was moved or XDG paths changed
+  if [[ ! -f "\$script" ]]; then
+    local default1="\${XDG_DATA_HOME:-\$HOME/.local/share}/ccm/ccm.sh"
+    local default2="\$HOME/.ccm/ccm.sh"
+    local default3="$SCRIPT_PATH"
+    if [[ -f "\$default1" ]]; then
+      script="\$default1"
+    elif [[ -f "\$default2" ]]; then
+      script="\$default2"
+    elif [[ -f "\$default3" ]]; then
+      script="\$default3"
+    fi
+  fi
   if [[ ! -f "\$script" ]]; then
     echo "ccm error: script not found at \$script" >&2
     return 1
   fi
+
+  # All commands use eval to apply environment variables
   case "\$1" in
     ""|"help"|"-h"|"--help"|"status"|"st"|"config"|"cfg")
+      # These commands don't need eval, execute directly
       "\$script" "\$@"
       ;;
     *)
-      eval "\$("\$script" "\$@")"
+      # All other commands (including pp) use eval to set environment variables
+      eval "\$(\"\$script\" \"\$@\")"
       ;;
   esac
+}
+
+# CCC: Claude Code Commander - switch model and launch Claude Code
+ccc() {
+  if [[ \$# -eq 0 ]]; then
+    echo "Usage: ccc <model> [claude-options]"
+    echo ""
+    echo "Examples:"
+    echo "  ccc deepseek                              # Launch with DeepSeek"
+    echo "  ccc pp deepseek                           # Launch with PPINFRA DeepSeek"
+    echo "  ccc glm --dangerously-skip-permissions    # Launch GLM with options"
+    echo ""
+    echo "Available models:"
+    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, longcat"
+    echo "  PPINFRA:  pp deepseek, pp glm, pp kimi, pp qwen"
+    return 1
+  fi
+
+  # Check for pp prefix
+  local use_pp=false
+  local model=""
+  local claude_args=()
+  
+  if [[ "\$1" == "pp" ]]; then
+    use_pp=true
+    shift
+    model="\$1"
+    shift
+  else
+    model="\$1"
+    shift
+  fi
+  
+  # Collect additional Claude Code arguments
+  claude_args=("\$@")
+  
+  # Call ccm to set environment variables
+  if \$use_pp; then
+    echo "🔄 Switching to PPINFRA \$model..."
+    ccm pp "\$model" || return 1
+  else
+    echo "🔄 Switching to \$model..."
+    ccm "\$model" || return 1
+  fi
+
+  echo ""
+  echo "🚀 Launching Claude Code..."
+  echo "   Model: \$ANTHROPIC_MODEL"
+  echo "   Base URL: \${ANTHROPIC_BASE_URL:-Default (Anthropic)}"
+  echo ""
+
+  # Launch Claude Code
+  if [[ \${#claude_args[@]} -eq 0 ]]; then
+    exec claude
+  else
+    exec claude "\${claude_args[@]}"
+  fi
 }
 $END_MARK
 EOF
@@ -77,14 +154,29 @@ main() {
   fi
   chmod +x "$SCRIPT_PATH"
 
+  # Install ccm assets to a stable per-user directory
+  mkdir -p "$INSTALL_DIR"
+  cp -f "$SCRIPT_PATH" "$DEST_SCRIPT_PATH"
+  chmod +x "$DEST_SCRIPT_PATH"
+  if [[ -d "$SCRIPT_DIR/lang" ]]; then
+    rm -rf "$INSTALL_DIR/lang"
+    cp -R "$SCRIPT_DIR/lang" "$INSTALL_DIR/lang"
+  fi
+
   local rc
   rc="$(detect_rc_file)"
   remove_existing_block "$rc"
   append_function_block "$rc"
 
-  echo "✅ Installed ccm function into: $rc"
+  echo "✅ Installed ccm and ccc functions into: $rc"
+  echo "   Script installed to: $DEST_SCRIPT_PATH"
   echo "   Reload your shell or run: source $rc"
-  echo "   Then use: ccm kimi  (or: ccm ds / ccm qwen / ccm glm / ccm claude / ccm opus)"
+  echo ""
+  echo "   Then use:"
+  echo "     ccm deepseek       # Switch model in current terminal"
+  echo "     ccc deepseek       # Switch model and launch Claude Code"
+  echo "     ccm pp glm         # Use PPINFRA fallback service"
+  echo "     ccc pp glm         # PPINFRA + launch Claude Code"
 }
 
 main "$@"
