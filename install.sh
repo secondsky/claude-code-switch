@@ -82,7 +82,7 @@ ccm() {
       ;;
     *)
       # All other commands (including pp) use eval to set environment variables
-      eval "\$(\"\$script\" \"\$@\")"
+      eval "\$("\$script" "\$@")"
       ;;
   esac
 }
