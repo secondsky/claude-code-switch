@@ -6,8 +6,22 @@ set -euo pipefail
 # - Does NOT rely on modifying PATH or copying binaries
 # - Idempotent: will replace previous CCM function block if exists
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_PATH="$SCRIPT_DIR/ccm.sh"
+# GitHub repository info
+GITHUB_REPO="foreveryh/claude-code-switch"
+GITHUB_BRANCH="main"
+GITHUB_RAW="https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}"
+
+# Detect if running from local directory or piped from curl
+if [[ -n "${BASH_SOURCE[0]:-}" ]] && [[ -f "${BASH_SOURCE[0]}" ]]; then
+  # Running locally
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  LOCAL_MODE=true
+else
+  # Piped from curl or running without source file
+  SCRIPT_DIR=""
+  LOCAL_MODE=false
+fi
+
 # Install destination (stable per-user location)
 INSTALL_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/ccm"
 DEST_SCRIPT_PATH="$INSTALL_DIR/ccm.sh"
@@ -60,13 +74,10 @@ ccm() {
   if [[ ! -f "\$script" ]]; then
     local default1="\${XDG_DATA_HOME:-\$HOME/.local/share}/ccm/ccm.sh"
     local default2="\$HOME/.ccm/ccm.sh"
-    local default3="$SCRIPT_PATH"
     if [[ -f "\$default1" ]]; then
       script="\$default1"
     elif [[ -f "\$default2" ]]; then
       script="\$default2"
-    elif [[ -f "\$default3" ]]; then
-      script="\$default3"
     fi
   fi
   if [[ ! -f "\$script" ]]; then
@@ -147,21 +158,46 @@ $END_MARK
 EOF
 }
 
-main() {
-  if [[ ! -f "$SCRIPT_PATH" ]]; then
-    echo "Error: ccm.sh not found next to install.sh: $SCRIPT_PATH" >&2
-    exit 1
+download_from_github() {
+  local url="$1"
+  local dest="$2"
+  echo "Downloading from $url..."
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$url" -o "$dest"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$dest" "$url"
+  else
+    echo "Error: neither curl nor wget found" >&2
+    return 1
   fi
-  chmod +x "$SCRIPT_PATH"
+}
 
-  # Install ccm assets to a stable per-user directory
+main() {
   mkdir -p "$INSTALL_DIR"
-  cp -f "$SCRIPT_PATH" "$DEST_SCRIPT_PATH"
-  chmod +x "$DEST_SCRIPT_PATH"
-  if [[ -d "$SCRIPT_DIR/lang" ]]; then
-    rm -rf "$INSTALL_DIR/lang"
-    cp -R "$SCRIPT_DIR/lang" "$INSTALL_DIR/lang"
+
+  if $LOCAL_MODE && [[ -f "$SCRIPT_DIR/ccm.sh" ]]; then
+    # Local mode: copy from local directory
+    echo "Installing from local directory..."
+    cp -f "$SCRIPT_DIR/ccm.sh" "$DEST_SCRIPT_PATH"
+    if [[ -d "$SCRIPT_DIR/lang" ]]; then
+      rm -rf "$INSTALL_DIR/lang"
+      cp -R "$SCRIPT_DIR/lang" "$INSTALL_DIR/lang"
+    fi
+  else
+    # Remote mode: download from GitHub
+    echo "Installing from GitHub..."
+    download_from_github "${GITHUB_RAW}/ccm.sh" "$DEST_SCRIPT_PATH" || {
+      echo "Error: failed to download ccm.sh" >&2
+      exit 1
+    }
+    
+    # Download lang files
+    mkdir -p "$INSTALL_DIR/lang"
+    download_from_github "${GITHUB_RAW}/lang/zh-CN.sh" "$INSTALL_DIR/lang/zh-CN.sh" || true
+    download_from_github "${GITHUB_RAW}/lang/en-US.sh" "$INSTALL_DIR/lang/en-US.sh" || true
   fi
+
+  chmod +x "$DEST_SCRIPT_PATH"
 
   local rc
   rc="$(detect_rc_file)"
