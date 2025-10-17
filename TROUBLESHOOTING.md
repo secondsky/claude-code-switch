@@ -81,7 +81,91 @@ mv ~/.claude-code-router.disabled ~/.claude-code-router
 
 ---
 
-## 问题 2：环境变量未生效
+## 问题 2：代码更新后命令失效或报错
+
+### 症状
+
+运行 `ccm` 命令时出现以下错误之一：
+
+```bash
+# 错误示例 1：新增的命令不存在
+ccm h
+(eval):1: bad pattern: ^[[0
+zsh: parse error near `:1:'
+
+# 错误示例 2：新功能无法使用
+ccm haiku
+zsh: command not found: haiku
+
+# 错误示例 3：旧版本行为
+ccm status  # 显示的是旧配置，没有新添加的模型
+```
+
+### 原因分析
+
+**重要**：`ccm` shell 函数使用的是**已安装的脚本**（位于 `~/.local/share/ccm/ccm.sh`），而不是您工作目录中修改的开发版本。
+
+当您：
+1. ✏️ 修改了 `ccm.sh` 文件
+2. ❌ 但忘记重新安装
+3. 🔍 运行 `ccm` 命令
+
+结果：您仍在使用**旧版本**的代码，新功能完全不会生效。
+
+### 解决方案
+
+#### ✅ 标准开发流程（每次修改代码后必做）
+
+```bash
+# 1. 修改代码后，重新安装
+./install.sh
+
+# 2. 重新加载 shell 配置
+source ~/.zshrc  # 或 source ~/.bashrc
+
+# 3. 验证更新
+ccm status      # 检查版本是否更新
+ccm help        # 确认新命令出现在帮助中
+```
+
+#### 🔍 验证是否需要重新安装
+
+```bash
+# 检查已安装版本的位置
+type ccm
+# 输出：ccm is a shell function from /Users/xxx/.zshrc
+
+# 查看已安装脚本的修改时间
+ls -lh ~/.local/share/ccm/ccm.sh
+
+# 对比工作目录版本
+ls -lh ccm.sh
+
+# 如果时间不匹配，说明需要重新安装
+```
+
+#### 🎯 开发者工作流程速查
+
+```bash
+# 开发循环
+1. vim ccm.sh              # 编辑代码
+2. ./install.sh            # 安装更新
+3. source ~/.zshrc         # 重载配置  
+4. ccm <test-command>      # 测试功能
+5. 如有问题，回到步骤 1
+```
+
+### 特别提醒
+
+⚠️ **常见错误模式**：
+- ❌ 修改代码 → 直接运行 `ccm` → 疑惑为什么没生效
+- ✅ 修改代码 → `./install.sh` → `source ~/.zshrc` → 运行 `ccm`
+
+💡 **记忆技巧**：把 `./install.sh && source ~/.zshrc` 作为一个固定操作，每次改代码后都执行。
+
+---
+
+## 问题 3：环境变量未生效
 
 ### 症状
 
@@ -117,7 +201,7 @@ claude
 
 ---
 
-## 问题 3：PPINFRA API Key 未配置
+## 问题 4：PPINFRA API Key 未配置
 
 ### 症状
 ```
