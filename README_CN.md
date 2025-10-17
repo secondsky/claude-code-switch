@@ -91,6 +91,7 @@ ccm status
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
+|| 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ 仅官方 | 快速高效 |
 
 > 💰 **PPINFRA 备用服务注册**
 >
@@ -172,6 +173,7 @@ ccm glm           # 切换到GLM4.6
 ccm longcat       # 切换到LongCat
 ccm claude        # 切换到Claude Sonnet 4.5
 ccm opus          # 切换到Claude Opus 4.1
+ccm haiku         # 切换到Claude Haiku 4.5
 
 # 切换到PPINFRA服务（显式备用）
 ccm pp            # 交互式PPINFRA模型选择
@@ -206,6 +208,7 @@ ccm status
 ./ccm.sh ds           # deepseek的简写
 ./ccm.sh s            # claude sonnet的简写  
 ./ccm.sh o            # opus的简写
+./ccm.sh h            # haiku的简写
 ./ccm.sh st           # status的简写
 ```
 

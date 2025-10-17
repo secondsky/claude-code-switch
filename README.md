@@ -94,7 +94,8 @@ ccm status
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
-| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
+|| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
+|| 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
 
 > 💰 **PPINFRA Fallback Service Registration**
 >
@@ -213,8 +214,9 @@ ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
 ccm claude        # Switch to Claude Sonnet 4.5
 ccm opus          # Switch to Claude Opus 4.1
+ccm haiku         # Switch to Claude Haiku 4.5
 
-# Switch to PPINFRA service (explicit fallback)
+# Switch to PPINFRA service
 ccm pp            # Interactive PPINFRA model selection
 ccm pp deepseek   # Direct switch to PPINFRA DeepSeek
 ccm pp glm        # Direct switch to PPINFRA GLM
@@ -254,9 +256,10 @@ Placeholders like `your-xxx-api-key` or empty values are treated as not configur
 ccm ds           # Short for deepseek
 ccm s            # Short for claude sonnet  
 ccm o            # Short for opus
+ccm h            # Short for haiku
 ccm st           # Short for status
 
-# ccc shortcuts (same model names)
+# ccc shortcuts
 ccc ds           # Launch with DeepSeek
 ccc pp ds        # Launch with PPINFRA DeepSeek
 ```

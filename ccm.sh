@@ -130,6 +130,8 @@ CLAUDE_MODEL=claude-sonnet-4-5-20250929
 CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
 OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+HAIKU_MODEL=claude-haiku-4-5
+HAIKU_SMALL_FAST_MODEL=claude-haiku-4-5
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
@@ -234,6 +236,8 @@ CLAUDE_MODEL=claude-sonnet-4-5-20250929
 CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
 OPUS_MODEL=claude-opus-4-1-20250805
 OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929
+HAIKU_MODEL=claude-haiku-4-5
+HAIKU_SMALL_FAST_MODEL=claude-haiku-4-5
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
@@ -370,6 +374,17 @@ switch_to_opus() {
     export ANTHROPIC_MODEL="claude-opus-4-1-20250805"
     export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-5-20250929"
     echo -e "${GREEN}✅ 已切换到 Claude Opus 4.1 (使用 Claude Pro 订阅)${NC}"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+}
+
+# 切换到Claude Haiku
+switch_to_haiku() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Haiku 4.5...${NC}"
+    clean_env
+    export ANTHROPIC_MODEL="${HAIKU_MODEL:-claude-haiku-4-5}"
+    export ANTHROPIC_SMALL_FAST_MODEL="${HAIKU_SMALL_FAST_MODEL:-claude-haiku-4-5}"
+    echo -e "${GREEN}✅ 已切换到 Claude Haiku 4.5 (使用 Claude Pro 订阅)${NC}"
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
@@ -586,6 +601,7 @@ show_help() {
     echo "  glm, glm4          - env glm"
     echo "  claude, sonnet, s  - env claude"
     echo "  opus, o            - env opus"
+    echo "  haiku, h           - env haiku"
     echo ""
     echo -e "${YELLOW}$(t 'tool_options'):${NC}"
     echo "  status, st       - $(t 'show_current_config')"
@@ -606,6 +622,7 @@ show_help() {
     echo "  🇨🇳 GLM4.6             - 官方：glm-4.6 / glm-4.5-air"
     echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
     echo "  🚀 Claude Opus 4.1     - claude-opus-4-1-20250805"
+    echo "  🔷 Claude Haiku 4.5    - claude-haiku-4-5"
 }
 
 # 将缺失的模型ID覆盖项追加到配置文件（仅追加缺失项，不覆盖已存在的配置）
@@ -625,6 +642,8 @@ ensure_model_override_defaults() {
         "CLAUDE_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
         "OPUS_MODEL=claude-opus-4-1-20250805"
         "OPUS_SMALL_FAST_MODEL=claude-sonnet-4-5-20250929"
+        "HAIKU_MODEL=claude-haiku-4-5"
+        "HAIKU_SMALL_FAST_MODEL=claude-haiku-4-5"
     )
     local added_header=0
     for pair in "${pairs[@]}"; do
@@ -846,6 +865,16 @@ emit_env_exports() {
             echo "export ANTHROPIC_MODEL='${opus_model}'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='${opus_small}'"
             ;;
+        "haiku"|"h")
+            echo "$prelude"
+            echo "unset ANTHROPIC_BASE_URL"
+            echo "unset ANTHROPIC_API_URL"
+            echo "unset ANTHROPIC_API_KEY"
+            local haiku_model="${HAIKU_MODEL:-claude-haiku-4-5}"
+            local haiku_small="${HAIKU_SMALL_FAST_MODEL:-claude-haiku-4-5}"
+            echo "export ANTHROPIC_MODEL='${haiku_model}'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='${haiku_small}'"
+            ;;
         "longcat")
             if ! is_effectively_set "$LONGCAT_API_KEY"; then
                 # 兜底：直接 source 配置文件一次（修复某些行格式导致的加载失败）
@@ -906,6 +935,9 @@ main() {
         "opus"|"o")
             emit_env_exports opus
             ;;
+        "haiku"|"h")
+            emit_env_exports haiku
+            ;;
         "env")
             shift
             emit_env_exports "${1:-}"
@@ -922,7 +954,7 @@ main() {
         "config"|"cfg")
             edit_config
             ;;
-        "help"|"h"|"-h"|"--help")
+        "help"|"-h"|"--help")
             show_help
             ;;
         *)
