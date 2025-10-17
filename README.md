@@ -4,75 +4,152 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
-[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/yourusername/claude-code-switch)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/foreveryh/claude-code-switch)
 
 [中文文档](README_CN.md) | [English](README.md)
 
 ## 🚀 Quick Start (60 seconds)
 
-- Zero-config (no install; run from repo)
+### ⚡ One-Command Installation (Recommended)
+The easiest way - no cloning needed:
+
 ```bash
-# Clone and enter the project
-git clone https://github.com/yourusername/claude-code-switch.git
+# Step 1: Download and install
+curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+```
+
+```bash
+# Step 2: Reload your shell (choose one)
+source ~/.zshrc  # for zsh users
+# OR
+source ~/.bashrc # for bash users
+```
+
+```bash
+# Step 3: Verify installation and try it
+ccm status                    # Check configuration
+ccm deepseek                  # Switch to DeepSeek model
+ccc deepseek                  # Launch Claude Code with DeepSeek (recommended)
+```
+
+**What happens:**
+- ✅ Downloads ccm.sh from GitHub
+- ✅ Installs to `~/.local/share/ccm/`
+- ✅ Adds `ccm()` and `ccc()` functions to your shell rc
+- ✅ Creates `~/.ccm_config` for API key storage
+
+---
+
+### Alternative: Clone & Install Locally
+If you prefer to clone the repository (useful for development):
+
+```bash
+# Step 1: Clone the repository
+git clone https://github.com/foreveryh/claude-code-switch.git
 cd claude-code-switch
 
-# One-command launch (does not modify your shell)
-./ccc deepseek                    # Switch env for the spawned Claude Code only and launch it
+# Step 2: Make scripts executable and install
+chmod +x install.sh ccm.sh
+./install.sh
 
-# Or manage environment without installing (current shell only)
-./ccm status                      # View current (masked) status
-eval "$(./ccm env deepseek)"      # Apply env to current shell
+# Step 3: Reload shell
+source ~/.zshrc  # or source ~/.bashrc for bash
 ```
 
-- Install (adds ccm and ccc functions to your shell rc)
+**Without installation** (run from cloned directory):
 ```bash
-chmod +x install.sh ccm.sh && ./install.sh
-source ~/.zshrc  # reload current shell
+# Try without modifying your shell
+./ccc deepseek                              # Launch with DeepSeek (current process only)
+
+# Or apply to current shell only
+eval "$(./ccm env deepseek)"               # Set env vars in current shell only
+./ccm status                                # View configuration
 ```
 
-- Configure (env > config)
-```bash
-# Option A: create/edit config file
-ccm            # first run creates ~/.ccm_config
-ccm config     # open it in your editor
+---
 
-# Option B: set environment variables (highest priority)
-export DEEPSEEK_API_KEY=sk-...
+### Configuration
+
+**Option A: Environment Variables** (Highest Priority)
+```bash
+export DEEPSEEK_API_KEY=sk-your-key
+export KIMI_API_KEY=your-key
+export QWEN_API_KEY=your-key
+# Then use: ccm deepseek
 ```
 
-- Use (after install)
+**Option B: Configuration File** (Persistent)
 ```bash
-# Switch models in current terminal
-ccm deepseek   # or: ccm ds / ccm kimi / ccm qwen / ccm glm / ccm claude / ccm opus
+ccm config                    # Opens config in your editor
+# Or edit manually: vim ~/.ccm_config
+```
+
+---
+
+### Using CCM (After Installation)
+
+```bash
+# Check current setup
 ccm status
 
-# Or switch and launch Claude Code in one command
-ccc deepseek   # switches to DeepSeek and launches Claude Code
-ccc pp glm     # switches to PPINFRA GLM and launches Claude Code
+# Switch models in current terminal
+ccm deepseek                              # Switch to DeepSeek
+ccm kimi                                  # Switch to KIMI
+ccm glm                                   # Switch to GLM
+ccm pp qwen                              # Use PPINFRA Qwen
+
+# Launch Claude Code with selected model
+ccc deepseek                              # Recommended way
+ccc pp kimi                               # PPINFRA version
+ccc claude --dangerously-skip-permissions # Pass options to Claude Code
 ```
 
-- Uninstall
+---
+
+### Uninstall
+
 ```bash
+# Run uninstall script
 ./uninstall.sh
+
+# Or manually remove
+rm -rf ~/.local/share/ccm
+# Then remove ccm() and ccc() function blocks from ~/.zshrc or ~/.bashrc
 ```
 
-Notes: installer adds ccm() and ccc() functions into your ~/.zshrc (or ~/.bashrc). Secrets are masked in status. Recommend chmod 600 ~/.ccm_config
+**Note:** Installer adds `ccm()` and `ccc()` functions to your shell rc file. API keys in `~/.ccm_config` are masked for security (recommend `chmod 600 ~/.ccm_config`)
 
 ## 🎯 Quick Experience (30 seconds)
 
-Want to try immediately without any configuration? Just install and use DeepSeek 3.1:
+Want to try immediately **without any API key configuration**? No problem! CCM includes a built-in DeepSeek experience key for testing.
+
+### Complete Flow - No Config Needed:
 
 ```bash
-# 1. Install
-chmod +x install.sh ccm.sh && ./install.sh
+# 1. Install (one-liner)
+curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+
+# 2. Reload shell
 source ~/.zshrc
 
-# 2. Use DeepSeek 3.1 immediately (no config needed!)
-ccm deepseek
-ccm status
+# 3. Try it immediately (no keys needed!)
+ccm status                    # View configuration
+ccc deepseek                  # Launch Claude Code with DeepSeek
 ```
 
-✨ **Magic Feature**: CCM includes a built-in DeepSeek 3.1 experience key that works with PPINFRA service. No API key configuration required for immediate testing!
+✨ **That's it!** You now have a working Claude Code setup with model switching.
+
+### Next Steps:
+```bash
+ccm config                    # Add your own API keys (optional)
+ccm help                      # View all available models and commands
+```
+
+**What's Included:**
+- ✅ Built-in DeepSeek 3.1 experience key (via PPINFRA)
+- ✅ Works immediately without configuration
+- ✅ Switch models: `ccm kimi`, `ccm glm`, `ccm qwen`, etc.
+- ✅ Add your own API keys later for unlimited usage
 
 ## 🌟 Features
 
@@ -111,11 +188,11 @@ ccm status
 
 ```bash
 # Clone the project
-git clone https://github.com/yourusername/claude-code-switch.git
+git clone https://github.com/foreveryh/claude-code-switch.git
 cd claude-code-switch
 
 # Or download script directly
-wget https://raw.githubusercontent.com/yourusername/claude-code-switch/main/ccm.sh
+wget https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/ccm.sh
 chmod +x ccm.sh
 ```
 
@@ -345,26 +422,76 @@ ccm status
 
 This approach is recommended for temporary use or testing, as it only affects the current shell session.
 
-## 🛠️ Install (adds ccm and ccc functions to rc)
+## 🛠️ Installation Methods
 
-CCM supports safe one-step installation without modifying your shell configuration files.
+CCM supports multiple installation methods. Choose the one that works best for you.
 
-### One-step install
+### Method 1: Quick Install (Recommended) ⚡
+One-command installation from GitHub - no cloning required:
+
 ```bash
-# From the project directory
-chmod +x install.sh ccm.sh
-./install.sh
+curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+source ~/.zshrc  # reload shell
 ```
 
-- Writes `ccm()` and `ccc()` function blocks into your rc (zsh preferred, bash fallback)
-- `ccm`: Environment management - switches models in current terminal
-- `ccc`: One-command launcher - switches model and launches Claude Code
-- Does NOT copy binaries or modify PATH
-- Idempotent: re-running install replaces the previous block
+**Features:**
+- ✅ No cloning needed
+- ✅ Automatic file download from GitHub
+- ✅ Retry mechanism for network failures
+- ✅ File integrity verification
+- ✅ Progress feedback
+- ✅ Full error handling
+
+### Method 2: Local Install
+Clone the repository and install locally:
+
+```bash
+git clone https://github.com/foreveryh/claude-code-switch.git
+cd claude-code-switch
+chmod +x install.sh ccm.sh
+./install.sh
+source ~/.zshrc  # reload shell
+```
+
+### Method 3: Manual Installation
+For advanced users who want to inspect the code first:
+
+```bash
+# Download the script directly
+curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/ccm.sh -o ccm.sh
+chmod +x ccm.sh
+
+# Use without installation
+./ccm deepseek
+eval "$(./ccm env deepseek)"
+```
+
+### What Gets Installed?
+
+The installation process:
+- Copies `ccm.sh` to `~/.local/share/ccm/ccm.sh`
+- Copies language files to `~/.local/share/ccm/lang/`
+- Injects `ccm()` and `ccc()` shell functions into your rc file (~/.zshrc or ~/.bashrc)
+- Creates `~/.ccm_config` on first use (if it doesn't exist)
+
+**Does NOT:**
+- Modify system files
+- Change your PATH
+- Require sudo/root access
+- Affect other shell configurations
 
 ### Uninstall
+
+To remove CCM from your system:
+
 ```bash
+# If installed via quick-install.sh or install.sh
 ./uninstall.sh
+
+# Or manually:
+# 1. Remove the ccm/ccc function blocks from ~/.zshrc or ~/.bashrc
+# 2. Delete the installation directory
+rm -rf ~/.local/share/ccm
 ```
 
 
@@ -490,7 +617,7 @@ Issues and Pull Requests are welcome!
 
 ### Development Setup
 ```bash
-git clone https://github.com/yourusername/claude-code-switch.git
+git clone https://github.com/foreveryh/claude-code-switch.git
 cd claude-code-switch
 ```
 
@@ -515,4 +642,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ⭐ If this project helps you, please give it a Star!
 
-📧 Questions or suggestions? Feel free to submit an [Issue](https://github.com/yourusername/claude-code-switch/issues)
+📧 Questions or suggestions? Feel free to submit an [Issue](https://github.com/foreveryh/claude-code-switch/issues)

@@ -193,8 +193,8 @@ main() {
     
     # Download lang files
     mkdir -p "$INSTALL_DIR/lang"
-    download_from_github "${GITHUB_RAW}/lang/zh-CN.sh" "$INSTALL_DIR/lang/zh-CN.sh" || true
-    download_from_github "${GITHUB_RAW}/lang/en-US.sh" "$INSTALL_DIR/lang/en-US.sh" || true
+    download_from_github "${GITHUB_RAW}/lang/zh.json" "$INSTALL_DIR/lang/zh.json" || true
+    download_from_github "${GITHUB_RAW}/lang/en.json" "$INSTALL_DIR/lang/en.json" || true
   fi
 
   chmod +x "$DEST_SCRIPT_PATH"
