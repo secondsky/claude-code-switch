@@ -93,6 +93,14 @@ ccm status
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
 || 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ 仅官方 | 快速高效 |
 
+> 🎁 **GLM-4.6 官方注册**
+>
+> 使用智谱AI官方Claude Code集成：
+> - **注册链接**：https://www.bigmodel.cn/claude-code?ic=5XMIOZPPXB
+> - **邀请码**：`5XMIOZPPXB`
+>
+> GLM-4.6 支持官方 Claude Code 集成，零配置体验，无需 API key 即可开始使用！
+
 > 💰 **PPINFRA 备用服务注册**
 >
 > 注册PPINFRA服务可获得 **15元代金券**：

@@ -174,6 +174,14 @@ ccm help                      # View all available models and commands
 || 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 || 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
 
+> 🎁 **GLM-4.6 Official Registration**
+>
+> Get started with Zhipu AI's official Claude Code integration:
+> - **Registration Link**: https://www.bigmodel.cn/claude-code?ic=5XMIOZPPXB
+> - **Invitation Code**: `5XMIOZPPXB`
+>
+> GLM-4.6 supports official Claude Code integration with zero-configuration experience. No API key needed to get started!
+
 > 💰 **PPINFRA Fallback Service Registration**
 >
 > Get **¥15 voucher** when registering PPINFRA service:
