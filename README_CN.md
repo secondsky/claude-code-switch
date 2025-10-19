@@ -6,78 +6,38 @@
 [![Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/foreveryh/claude-code-switch)
 
-## 前提
+[中文文档](README_CN.md) | [English](README.md)
 
-使用本工具前，需要先完成以下准备工作：
+## 🎯 快速开始（零配置）
 
-1. 安装 Claude Code：
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-2. 克隆当前项目：
-```bash
-git clone https://github.com/foreveryh/claude-code-switch.git
-cd claude-code-switch
-```
-
-## 🎯 快速体验（克隆后立即可用）
-
-无需安装，直接在仓库目录中使用：
+想立即体验，**无需任何 API key**？3步开始：
 
 ```bash
-./ccc deepseek                      # 一步切换并启动 Claude Code（不修改你的 shell）
+# 1. 安装
+curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
 
-# 或仅在“当前 shell”应用环境变量：
-./ccm status
-eval "$(./ccm env deepseek)"
+# 2. 重载shell
+source ~/.zshrc  # 或 source ~/.bashrc for bash
+
+# 3. 立即尝试（无需密钥！）
+ccm glm          # 切换到 GLM-4.6
+ccc deepseek     # 启动 Claude Code with DeepSeek
 ```
 
-可选：全局安装 ccm/ccc 函数（便于在任意目录使用）：
-```bash
-chmod +x install.sh ccm.sh && ./install.sh
-source ~/.zshrc
-```
-
-# 🚀 一分钟上手（配置自己的 KEY）
-
-- 安装（不修改 zshrc）
-```bash
-chmod +x install.sh ccm.sh && ./install.sh
-```
-
-- 配置（环境变量 > 配置文件）
-```bash
-# 方式A：创建/编辑配置文件
-./ccm.sh            # 首次运行会生成 ~/.ccm_config
-./ccm.sh config     # 打开编辑
-
-# 方式B：设置环境变量（优先级最高）
-export DEEPSEEK_API_KEY=sk-...
-export LONGCAT_API_KEY=your-longcat-api-key
-```
-
-- 使用（当前 shell 生效）
-```bash
-eval "$(./ccm.sh env deepseek)"
-ccm status
-```
-
-- 卸载
-```bash
-./uninstall.sh
-```
-
-说明：不会修改 ~/.zshrc；status 输出已脱敏；建议为 ~/.ccm_config 设置 600 权限
-
+✨ **就这么简单！** 你现在已经拥有了：
+- ✅ 内置体验密钥（通过 PPINFRA）
+- ✅ 零配置要求
+- ✅ 多模型支持
+- ✅ 后续可添加自己的 API key 以获得无限使用
 
 ## 🌟 特性
 
 - 🤖 **多模型支持**：Claude、Deepseek、KIMI、GLM、Qwen等主流AI模型
 - 🔄 **智能备用机制**：官方API优先，自动切换到PPINFRA备用服务
 - ⚡ **快速切换**：一键切换不同AI模型，提升开发效率
+- 🚀 **一键启动**：`ccc`命令一步切换模型并启动Claude Code
 - 🎨 **彩色界面**：直观的命令行界面，清晰显示切换状态
-- 🛡️ **安全配置**：独立配置文件管理API密钥，支持多编辑器
+- 🛡️ **安全配置**：独立配置文件管理API密钥
 - 📊 **状态监控**：实时显示当前模型配置和密钥状态
 
 ## 📦 支持的模型
@@ -90,7 +50,7 @@ ccm status
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
-| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
+|| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
 || 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ 仅官方 | 快速高效 |
 
 > 🎁 **GLM-4.6 官方注册**
@@ -109,50 +69,78 @@ ccm status
 >
 > PPINFRA为Deepseek、KIMI、Qwen和GLM模型提供可靠的备用服务，当官方API不可用时自动切换。
 
-## 🚀 快速开始
+## 🛠️ 安装
 
-### 1. 下载脚本
+### 方式1：快速安装（推荐）⚡
+
+从GitHub一键安装，无需克隆：
 
 ```bash
-# 克隆项目
-git clone https://github.com/yourusername/claude-code-switch.git
+curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+source ~/.zshrc  # 重载shell
+```
+
+**特性：**
+- ✅ 无需克隆
+- ✅ 自动从GitHub下载
+- ✅ 网络失败重试机制
+- ✅ 文件完整性验证
+- ✅ 进度反馈和错误处理
+
+### 方式2：本地安装（用于开发）
+
+克隆仓库并本地安装：
+
+```bash
+git clone https://github.com/foreveryh/claude-code-switch.git
 cd claude-code-switch
-
-# 或直接下载脚本
-wget https://raw.githubusercontent.com/yourusername/claude-code-switch/main/ccm.sh
-chmod +x ccm.sh
+chmod +x install.sh ccm.sh
+./install.sh
+source ~/.zshrc  # 重载shell
 ```
 
-### 2. 首次运行
-
+**不安装使用**（从克隆的目录运行）：
 ```bash
-./ccm.sh
+./ccc deepseek                   # 启动DeepSeek（仅当前进程）
+eval "$(./ccm env deepseek)"    # 仅在当前shell设置环境变量
 ```
 
-首次运行会自动创建配置文件 `~/.ccm_config`，请编辑此文件添加你的API密钥。
+### 安装了什么？
 
-### 3. 配置API密钥
+安装过程：
+- 复制 `ccm.sh` 到 `~/.local/share/ccm/ccm.sh`
+- 复制语言文件到 `~/.local/share/ccm/lang/`
+- 在你的rc文件中注入 `ccm()` 和 `ccc()` shell函数（~/.zshrc 或 ~/.bashrc）
+- 首次使用时创建 `~/.ccm_config`（如果不存在）
 
-**🔑 优先级：环境变量 > 配置文件**
+**不会：**
+- 修改系统文件
+- 改变你的PATH
+- 需要sudo/root权限
+- 影响其他shell配置
 
-CCM 采用智能的配置层次结构：
-1. **环境变量**（最高优先级） - `export DEEPSEEK_API_KEY=your-key`
-2. **配置文件** `~/.ccm_config`（环境变量未设置时的备选）
+## ⚙️ 配置
 
-```bash
-# 方式1：设置环境变量（推荐，安全性更好）
-export DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-export KIMI_API_KEY=your-moonshot-api-key
-export LONGCAT_API_KEY=your-longcat-api-key
-export QWEN_API_KEY=sk-your-qwen-api-key
-export PPINFRA_API_KEY=your-ppinfra-api-key
+### 🔑 配置优先级
 
-# 方式2：编辑配置文件
-./ccm.sh config
-# 或手动： vim ~/.ccm_config
-```
+CCM使用分层配置系统：
 
-配置文件示例：
+1. **环境变量**（最高优先级）
+   ```bash
+   export DEEPSEEK_API_KEY=sk-your-key
+   export KIMI_API_KEY=your-key
+   export GLM_API_KEY=your-key
+   export QWEN_API_KEY=your-key
+   ```
+
+2. **配置文件** `~/.ccm_config`（备用）
+   ```bash
+   ccm config              # 在编辑器中打开配置
+   # 或手动编辑: vim ~/.ccm_config
+   ```
+
+### 配置文件示例
+
 ```bash
 # CCM 配置文件
 # 注意：环境变量优先级高于此文件
@@ -164,11 +152,39 @@ LONGCAT_API_KEY=your-longcat-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key  # 阿里云 DashScope
 
+# 可选：覆盖模型ID（省略时使用默认值）
+DEEPSEEK_MODEL=deepseek-chat
+KIMI_MODEL=kimi-k2-turbo-preview
+LONGCAT_MODEL=LongCat-Flash-Thinking
+QWEN_MODEL=qwen3-max
+GLM_MODEL=glm-4.6
+CLAUDE_MODEL=claude-sonnet-4-5-20250929
+OPUS_MODEL=claude-opus-4-1-20250805
+
 # 备用服务（仅当官方密钥缺失时启用）
 PPINFRA_API_KEY=your-ppinfra-api-key
 ```
 
+**安全提示：** 建议 `chmod 600 ~/.ccm_config` 以保护您的API密钥。
+
 ## 📖 使用方法
+
+### 两种使用方式
+
+**方式1：`ccm` - 环境管理**
+```bash
+ccm deepseek      # 切换到 DeepSeek
+ccm glm           # 切换到 GLM4.6
+ccm pp kimi       # 切换到 PPINFRA KIMI
+claude            # 然后手动启动 Claude Code
+```
+
+**方式2：`ccc` - 一键启动（推荐）**
+```bash
+ccc deepseek                            # 切换并启动
+ccc pp glm                              # 切换到PPINFRA并启动
+ccc kimi --dangerously-skip-permissions # 传递选项给Claude Code
+```
 
 ### 基本命令
 
@@ -183,235 +199,183 @@ ccm claude        # 切换到Claude Sonnet 4.5
 ccm opus          # 切换到Claude Opus 4.1
 ccm haiku         # 切换到Claude Haiku 4.5
 
-# 切换到PPINFRA服务（显式备用）
+# 切换到PPINFRA服务
 ccm pp            # 交互式PPINFRA模型选择
 ccm pp deepseek   # 直接切换到PPINFRA DeepSeek
 ccm pp glm        # 直接切换到PPINFRA GLM
 ccm pp kimi       # 直接切换到PPINFRA KIMI
 ccm pp qwen       # 直接切换到PPINFRA Qwen
 
-# 查看当前状态（脱敏）
-ccm status
+# 启动Claude Code
+ccc deepseek      # 切换到DeepSeek并启动
+ccc pp glm        # 切换到PPINFRA GLM并启动
+ccc opus          # 切换到Claude Opus并启动
 
-# 编辑配置
-ccm config
-
-# 显示帮助
-ccm help
-```
-
-### 在当前 shell 生效（推荐）
-
-使用 env 子命令，只输出 export 语句，不打印密钥明文：
-``bash
-# 将模型环境导出到当前 shell
-eval "$(ccm env deepseek)"
-# 验证
-ccm status
+# 工具命令
+ccm status        # 查看当前状态（脱敏）
+ccm config        # 编辑配置
+ccm help          # 显示帮助
+ccc               # 显示ccc使用帮助
 ```
 
 ### 命令简写
 
 ```bash
-./ccm.sh ds           # deepseek的简写
-./ccm.sh s            # claude sonnet的简写  
-./ccm.sh o            # opus的简写
-./ccm.sh h            # haiku的简写
-./ccm.sh st           # status的简写
+# ccm 简写
+ccm ds           # deepseek的简写
+ccm s            # claude sonnet的简写  
+ccm o            # opus的简写
+ccm h            # haiku的简写
+ccm st           # status的简写
+
+# ccc 简写
+ccc ds           # 使用DeepSeek启动
+ccc pp ds        # 使用PPINFRA DeepSeek启动
 ```
 
-### 实际使用示例
+### 使用示例
 
+**示例1：零配置（内置密钥）**
+```bash
+ccc deepseek
+🔄 切换到 deepseek...
+✅ 已配置环境: DeepSeek
+
+🚀 启动 Claude Code...
+   Model: deepseek-chat
+   Base URL: https://api.ppinfra.com/anthropic
 ```
-# 切换到KIMI进行长文本处理
-$ ./ccm.sh kimi
-🔄 切换到 KIMI2 模型...
-✅ 已切换到 KIMI2（官方）
-   BASE_URL: https://api.moonshot.cn/anthropic
-   MODEL: kimi-k2-turbo-preview
 
-# 切换到Deepseek进行代码生成（如果没有官方key，自动使用备用）
-$ ./ccm.sh deepseek  
-🔄 切换到 Deepseek 模型...
-✅ 已切换到 Deepseek（PPINFRA 备用）
-   BASE_URL: https://api.ppinfra.com/anthropic
-   MODEL: deepseek/deepseek-v3.1
-
-# 查看当前配置状态
-$ ./ccm.sh status
+**示例2：使用自己的API密钥**
+```bash
+export KIMI_API_KEY=your-moonshot-key
+ccm kimi
+ccm status
 📊 当前模型配置:
-   BASE_URL: https://api.ppinfra.com/anthropic
+   BASE_URL: https://api.moonshot.cn/anthropic
    AUTH_TOKEN: [已设置]
-   MODEL: deepseek/deepseek-v3.1
-   SMALL_MODEL: deepseek/deepseek-v3.1
+   MODEL: kimi-k2-turbo-preview
+   SMALL_MODEL: kimi-k2-turbo-preview
 
-🔧 环境变量状态:
-   GLM_API_KEY: [未设置]
-   KIMI_API_KEY: [已设置]
-   DEEPSEEK_API_KEY: [未设置]
-   QWEN_API_KEY: [未设置]
-   PPINFRA_API_KEY: [已设置]
-
-# 显式切换到PPINFRA服务
-$ ./ccm.sh pp deepseek
-🔄 切换到 DeepSeek v3.2-exp（PPINFRA）
-   BASE_URL: https://api.ppinfra.com/anthropic
-   MODEL: deepseek/deepseek-v3.2-exp
-   SMALL_MODEL: deepseek/deepseek-v3.2-exp
+claude  # 手动启动
 ```
 
-## 🛠️ 安装（不修改 zshrc）
-
-CCM 支持安全的一键安装，不会修改你的 shell 配置文件。
-
-### 一键安装
+**示例3：一键启动**
 ```bash
-# 在项目目录中
-chmod +x install.sh ccm.sh
-./install.sh
+ccc pp glm --dangerously-skip-permissions
+🔄 切换到 PPINFRA glm...
+✅ 已配置环境: GLM (PPINFRA)
+
+🚀 启动 Claude Code...
+   Model: zai-org/glm-4.6
+   Base URL: https://api.ppinfra.com/anthropic
 ```
 
-- 在可写时安装到 /usr/local/bin 或 /opt/homebrew/bin
-- 无法写入时回退到 ~/.local/bin
-- 不会修改 ~/.zshrc 或其它配置文件
-
-### 卸载
-```bash
-./uninstall.sh
-```
-
-如果安装到受保护目录，可能需要 sudo：
-```bash
-sudo install -m 0755 ./ccm.sh /usr/local/bin/ccm
-# 卸载
-sudo rm -f /usr/local/bin/ccm
-```
-
-## 🔧 高级配置
-
-### 🔑 配置优先级系统
-
-CCM 使用智能的分层配置系统：
-
-1. **环境变量**（最高优先级）
-   - 在shell会话中设置：`export DEEPSEEK_API_KEY=your-key`
-   - 推荐用于临时测试或CI/CD环境
-   - 始终优先于配置文件
-
-2. **配置文件** `~/.ccm_config`（备选）
-   - API密钥的持久化存储
-   - 仅在对应环境变量未设置时使用
-   - 适合日常开发使用
-
+## 🔧 高级特性
 
 ### 智能备用机制
 
-CCM实现了智能的备用机制：
-- **优先使用官方API**：如果配置了官方密钥，优先使用官方服务
-- **自动切换备用**：当官方密钥未配置时，自动切换到PPINFRA备用服务
-- **透明切换**：用户无感知，命令保持一致
+CCM实现智能备用：
+- **官方API优先**：配置官方密钥时使用官方服务
+- **自动备用**：官方密钥缺失时自动切换到PPINFRA备用服务
+- **透明切换**：对用户无感，命令保持一致
 
-### 安全与隐私
-- status 输出对密钥做脱敏（仅显示前后 4 位）
-- env 子命令只输出 export 语句与变量引用，不打印密钥明文
-- 配置优先级：环境变量 > ~/.ccm_config
-- 建议权限：`chmod 600 ~/.ccm_config`
+### 服务集成
 
-### PPINFRA备用服务
+**阿里云DashScope**（Qwen模型）：
+- Base URL: `https://dashscope.aliyuncs.com/api/v2/apps/claude-code-proxy`
+- 默认模型: `qwen3-max`（主要），`qwen3-next-80b-a3b-instruct`（快速）
+- API Key格式: 阿里云控制台的标准`sk-`前缀
 
-PPINFRA是一个第三方AI模型聚合服务，提供：
+**PPINFRA备用服务**：
 - Base URL: `https://api.ppinfra.com/anthropic`
-- 支持模型：
+- 支持的模型:
   - `kimi-k2-turbo-preview` (KIMI备用)
   - `deepseek/deepseek-v3.2-exp` (Deepseek备用)
   - `qwen3-next-80b-a3b-thinking` (Qwen备用)
   - `zai-org/glm-4.6` (GLM备用)
 
-### 配置文件详解
+### 安全和隐私
 
-`~/.ccm_config` 文件包含所有API密钥配置：
+- 状态输出脱敏处理（仅显示前/后4个字符）
+- CCM仅设置 `ANTHROPIC_AUTH_TOKEN`（不设置`ANTHROPIC_API_KEY`）
+- 配置文件优先级：环境变量 > ~/.ccm_config
+- 推荐文件权限：`chmod 600 ~/.ccm_config`
+
+## 🗑️ 卸载
 
 ```bash
-# 必需：各服务商官方密钥（至少配置一个）
-DEEPSEEK_API_KEY=sk-your-deepseek-key
-KIMI_API_KEY=your-moonshot-api-key
-GLM_API_KEY=your-glm-key
-QWEN_API_KEY=your-qwen-key
+# 如果通过quick-install.sh或install.sh安装
+./uninstall.sh
 
-# 可选：Qwen官方Anthropic兼容端点
-QWEN_ANTHROPIC_BASE_URL=https://your-qwen-gateway
-
-# 可选但推荐：备用服务密钥
-PPINFRA_API_KEY=your-ppinfra-key
-
-# Claude（如使用API而非Pro订阅）
-CLAUDE_API_KEY=your-claude-key
+# 或手动：
+# 1. 从 ~/.zshrc 或 ~/.bashrc 中删除 ccm/ccc 函数块
+# 2. 删除安装目录
+rm -rf ~/.local/share/ccm
+rm ~/.ccm_config  # 可选：删除配置文件
 ```
 
 ## 🐛 故障排除
 
 ### 常见问题
 
-**Q: 显示"未检测到XXX_API_KEY"错误**
+**问：收到"XXX_API_KEY not detected"错误**
 ```bash
-A: 请检查 ~/.ccm_config 文件中对应的API密钥是否正确配置
-   ./ccm.sh config  # 打开配置文件检查
+答：检查API密钥是否正确配置：
+   ccm config      # 打开配置文件检查
+   ccm status      # 查看当前配置
 ```
 
-**Q: 切换后Claude Code无法正常工作**
+**问：切换后Claude Code不工作**
 ```bash
-A: 确认环境变量已正确设置：
-   ./ccm.sh status  # 查看当前配置状态
-   echo $ANTHROPIC_BASE_URL  # 检查环境变量
+答：验证环境变量：
+   ccm status                   # 检查当前状态
+   echo $ANTHROPIC_BASE_URL     # 检查环境变量
+   env | grep ANTHROPIC         # 列出所有ANTHROPIC变量
 ```
 
-**Q: 想强制使用官方服务而非备用**
+**问：想使用官方服务而不是备用服务**
 ```bash
-A: 配置对应的官方API密钥，脚本会自动优先使用官方服务
+答：配置官方API密钥，CCM会自动优先使用：
+   export DEEPSEEK_API_KEY=sk-your-official-key
+   ccm deepseek
 ```
 
-### 调试模式
-
+**问：API_KEY vs AUTH_TOKEN 冲突**
 ```bash
-# 显示详细状态信息
-./ccm.sh status
-
-# 检查配置文件
-cat ~/.ccm_config
-
-# 验证环境变量
-env | grep ANTHROPIC
+答：CCM仅设置ANTHROPIC_AUTH_TOKEN，取消任何冲突变量：
+   unset ANTHROPIC_API_KEY
 ```
 
-## 🤝 贡献指南
+## 🤝 贡献
 
-欢迎提交Issue和Pull Request！
+欢迎Issues和Pull Requests！
 
 ### 开发设置
-``bash
-git clone https://github.com/yourusername/claude-code-switch.git
+```bash
+git clone https://github.com/foreveryh/claude-code-switch.git
 cd claude-code-switch
 ```
 
-### 提交规范
-- 使用清晰的commit message
+### 提交指南
+- 使用清晰的提交信息
 - 添加适当的测试
 - 更新文档
 
 ## 📄 许可证
 
-本项目采用 [MIT 许可证](LICENSE)。
+本项目采用 [MIT License](LICENSE) 许可。
 
 ## 🙏 致谢
 
 - [Claude](https://claude.ai) - AI助手
 - [Deepseek](https://deepseek.com) - 高效推理模型
 - [KIMI](https://kimi.moonshot.cn) - 长文本处理
-- [智谱清言](https://zhipuai.cn) - GLM大模型
+- [Zhipu AI](https://zhipuai.cn) - GLM大模型
 - [Qwen](https://qwen.alibaba.com) - 阿里通义千问
 
 ---
 
 ⭐ 如果这个项目对你有帮助，请给个Star！
 
-📧 有问题或建议？欢迎提交 [Issue](https://github.com/yourusername/claude-code-switch/issues)
+📧 有问题或建议？欢迎提交 [Issue](https://github.com/foreveryh/claude-code-switch/issues)
