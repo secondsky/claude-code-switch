@@ -461,6 +461,36 @@ print_next_steps() {
     echo ""
 }
 
+# Check if Claude Code is installed
+check_claude_installation() {
+    echo ""
+    echo -e "${CYAN}🔍 Checking Claude Code installation...${NC}"
+    
+    # Check if claude command exists
+    if command -v claude >/dev/null 2>&1; then
+        log_success "Claude Code detected"
+        return 0
+    fi
+
+    # Claude Code not detected - show installation guide
+    echo ""
+    log_warn "Claude Code not detected"
+    echo -e "${YELLOW}💡 CCM requires Claude Code to work properly${NC}"
+    echo ""
+    echo -e "${CYAN}📦 To install Claude Code (official command):${NC}"
+    echo -e "${GREEN}npm install -g @anthropic-ai/claude-code${NC}"
+    echo ""
+    echo -e "${CYAN}Then navigate to your project and start:${NC}"
+    echo "cd your-awesome-project"
+    echo "claude"
+    echo ""
+    echo -e "${BLUE}ℹ️  You'll be prompted to log in on first use${NC}"
+    echo ""
+
+    # Return 0 to not affect script exit status
+    return 0
+}
+
 # Main flow
 main() {
     echo ""
@@ -504,6 +534,9 @@ main() {
     # Print final message
     print_usage
     print_next_steps
+
+    # Check if Claude Code is installed
+    check_claude_installation
 
     log_success "Quick install completed!"
 }
