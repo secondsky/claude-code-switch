@@ -65,7 +65,7 @@ log_step() {
 
 # Check if running from pipe (curl | bash)
 is_piped() {
-    [[ ! -t 0 ]] && [[ "${BASH_SOURCE[0]}" == "/dev/stdin" ]]
+    [[ ! -t 0 ]] && [[ "${BASH_SOURCE[0]:-}" == "/dev/stdin" ]]
 }
 
 # Check system requirements
