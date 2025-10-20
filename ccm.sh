@@ -141,7 +141,8 @@ LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 EOF
         echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
         echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}" >&2
-        return 1
+        echo -e "${GREEN}🚀 Using default experience keys for now...${NC}" >&2
+        # Don't return 1 - continue with default fallback keys
     fi
     
     # 首先读取语言设置
