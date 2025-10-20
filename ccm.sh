@@ -136,8 +136,8 @@ LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
 EOF
-        echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}"
-        echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}"
+        echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
+        echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}" >&2
         return 1
     fi
     
@@ -242,8 +242,8 @@ LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 
 EOF
-    echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}"
-    echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}"
+    echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
+    echo -e "${YELLOW}   $(t 'edit_file_to_add_keys')${NC}" >&2
 }
 
 # 判断值是否为有效（非空且非占位符）
@@ -958,9 +958,9 @@ main() {
             show_help
             ;;
         *)
-            echo -e "${RED}❌ $(t 'unknown_option'): $1${NC}"
-            echo ""
-            show_help
+            echo -e "${RED}❌ $(t 'unknown_option'): $1${NC}" >&2
+            echo "" >&2
+            show_help >&2
             return 1
             ;;
     esac
