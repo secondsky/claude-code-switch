@@ -68,6 +68,9 @@ append_function_block() {
   cat >> "$rc" <<EOF
 $BEGIN_MARK
 # CCM: define a shell function that applies exports to current shell
+# Ensure no alias/function clashes
+unalias ccm 2>/dev/null || true
+unset -f ccm 2>/dev/null || true
 ccm() {
   local script="$DEST_SCRIPT_PATH"
   # Fallback search if the installed script was moved or XDG paths changed
@@ -99,6 +102,9 @@ ccm() {
 }
 
 # CCC: Claude Code Commander - switch model and launch Claude Code
+# Ensure no alias/function clashes
+unalias ccc 2>/dev/null || true
+unset -f ccc 2>/dev/null || true
 ccc() {
   if [[ \$# -eq 0 ]]; then
     echo "Usage: ccc <model> [claude-options]"
