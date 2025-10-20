@@ -39,7 +39,7 @@ load_translations() {
     fi
 
     # 清理现有翻译变量
-    unset $(set | grep '^TRANS_' | cut -d= -f1) 2>/dev/null || true
+    unset $(set | grep '^TRANS_' | LC_ALL=C cut -d= -f1) 2>/dev/null || true
 
     # 读取JSON文件并解析到变量
     if [[ -f "$lang_file" ]]; then
@@ -117,6 +117,9 @@ QWEN_API_KEY=your-qwen-api-key
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
 
+# 备用提供商（仅当且仅当官方密钥未提供时启用）
+PPINFRA_API_KEY=your-ppinfra-api-key
+
 # —— 可选：模型ID覆盖（不设置则使用下方默认）——
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
@@ -144,7 +147,7 @@ EOF
     # 首先读取语言设置
     if [[ -f "$CONFIG_FILE" ]]; then
         local config_lang
-        config_lang=$(grep -E "^[[:space:]]*CCM_LANGUAGE[[:space:]]*=" "$CONFIG_FILE" 2>/dev/null | head -1 | cut -d'=' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+        config_lang=$(grep -E "^[[:space:]]*CCM_LANGUAGE[[:space:]]*=" "$CONFIG_FILE" 2>/dev/null | head -1 | LC_ALL=C cut -d'=' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
         if [[ -n "$config_lang" && -z "$CCM_LANGUAGE" ]]; then
             export CCM_LANGUAGE="$config_lang"
             lang_preference="$config_lang"
@@ -222,6 +225,9 @@ QWEN_API_KEY=your-qwen-api-key
 
 # Claude (如果使用API key而非Pro订阅)
 CLAUDE_API_KEY=your-claude-api-key
+
+# 备用提供商（仅当且仅当官方密钥未提供时启用）
+PPINFRA_API_KEY=your-ppinfra-api-key
 
 # —— 可选：模型ID覆盖（不设置则使用下方默认）——
 DEEPSEEK_MODEL=deepseek-chat
