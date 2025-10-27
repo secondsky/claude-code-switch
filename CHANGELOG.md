@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.2.0] - 2025-10-27
+
+### Added - Claude Pro Account Management 🔐
+- ✨ **Multiple Claude Pro account support**: Manage and switch between multiple Claude Pro subscription accounts
+  - `ccm save-account <name>` - Save current logged-in account credentials
+  - `ccm switch-account <name>` - Switch to a saved account without re-login
+  - `ccm list-accounts` - List all saved accounts with status
+  - `ccm delete-account <name>` - Delete saved account
+  - `ccm current-account` - Show current account information
+- 🚀 **Quick account switching**: `ccm opus:account` or `ccm haiku:account` syntax
+  - Switch account and select model in one command
+  - Works with `ccc` launcher: `ccc opus:work`
+- 🔒 **Secure credential storage**: Account tokens stored in `~/.ccm_accounts` (chmod 600)
+  - Credentials encrypted with base64 encoding
+  - Automatic token refresh support
+  - Persists across system reboots
+- 🌐 **Multi-language support**: Added 24 new translation keys for account management
+  - English and Chinese translations
+  - Seamless integration with existing i18n system
+
+### Changed
+- 📚 Updated documentation:
+  - Added comprehensive account management guide in README.md and README_CN.md
+  - Updated help text (`ccm help`) with account commands
+  - Added usage examples and setup guides
+- 🔧 Enhanced Claude model functions:
+  - `switch_to_claude()`, `switch_to_opus()`, `switch_to_haiku()` now support account parameter
+  - Better error handling and user feedback
+
+### Use Case
+This update enables users to bypass Claude Pro usage limits by managing multiple Pro accounts, which is more cost-effective than upgrading to Claude Max. Each account has independent usage quotas (5 hours/day, weekly limits).
+
 ## [2.0.0] - 2025-10-01
 
 ### Added - Plan B Implementation

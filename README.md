@@ -170,6 +170,91 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 
 **Security Note:** Recommend `chmod 600 ~/.ccm_config` to protect your API keys.
 
+## 🔐 Claude Pro Account Management (NEW in v2.2.0)
+
+CCM now supports managing multiple Claude Pro subscription accounts! Switch between accounts to bypass usage limits without upgrading to Claude Max.
+
+### Why Use Multiple Accounts?
+
+- **Bypass Usage Limits**: Each Claude Pro account has its own usage limits (5 hours per day, weekly caps)
+- **Cost-Effective**: Multiple Pro accounts are cheaper than one Max account
+- **Seamless Switching**: No need to log out/in - CCM handles authentication automatically
+- **Secure Storage**: Account credentials encrypted and stored locally
+
+### Account Management Commands
+
+```bash
+# Save current logged-in account
+ccm save-account work              # Save as "work"
+ccm save-account personal          # Save as "personal"
+
+# Switch between accounts
+ccm switch-account work            # Switch to work account
+ccm switch-account personal        # Switch to personal account
+
+# View all saved accounts
+ccm list-accounts
+# Output:
+# 📋 Saved Claude Pro accounts:
+#   - work (Pro, expires: 2025-12-31, ✅ active)
+#   - personal (Pro, expires: 2025-12-31)
+
+# Check current account
+ccm current-account
+
+# Delete saved account
+ccm delete-account old-account
+```
+
+### Quick Account Switching with Models
+
+```bash
+# Switch account and select model in one command
+ccm opus:work                      # Switch to work account, use Opus
+ccm haiku:personal                 # Switch to personal account, use Haiku
+ccc opus:work                      # Switch account and launch Claude Code
+ccc woohelps                       # Switch to 'woohelps' account and launch (default model)
+```
+
+### Account Setup Guide
+
+**Step 1**: Save your first account
+```bash
+# Login to Claude Code with account 1 in browser
+# Launch Claude Code to verify it works
+ccm save-account account1
+```
+
+**Step 2**: Save additional accounts
+```bash
+# Quit Claude Code
+# Logout from claude.ai in browser
+# Login with account 2
+# Launch Claude Code again
+ccm save-account account2
+```
+
+**Step 3**: Switch between accounts anytime
+```bash
+ccm switch-account account1        # No browser login needed!
+# Restart Claude Code for changes to take effect
+```
+
+**Important Notes**:
+- Tokens are refreshed automatically - no re-login needed until they expire
+- After switching accounts, restart Claude Code for changes to take effect
+- Account credentials are stored in `~/.ccm_accounts` (chmod 600)
+- Credentials persist across system reboots
+ - Keychain service name defaults to `Claude Code-credentials`. Override via `CCM_KEYCHAIN_SERVICE` if your system uses a different name.
+
+### Debugging Keychain
+
+```bash
+ccm debug-keychain                # Inspect current Keychain credentials and match saved accounts
+# If it shows no credentials but you are logged in, set service override:
+CCM_KEYCHAIN_SERVICE="Claude Code" ccm debug-keychain
+```
+
 ## 📖 Usage
 
 ### Two Ways to Use CCM

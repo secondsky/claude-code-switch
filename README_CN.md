@@ -170,6 +170,91 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 
 **安全提示：** 建议 `chmod 600 ~/.ccm_config` 以保护您的API密钥。
 
+## 🔐 Claude Pro 账号管理（v2.2.0 新功能）
+
+CCM 现在支持管理多个 Claude Pro 订阅账号！在账号之间切换以突破使用限制，无需升级到 Claude Max。
+
+### 为什么使用多账号？
+
+- **突破使用限制**：每个 Claude Pro 账号有独立的使用限制（每天5小时、每周限制）
+- **节省成本**：多个 Pro 账号比一个 Max 账号更便宜
+- **无缝切换**：无需登出/登入 - CCM 自动处理认证
+- **安全存储**：账号凭证加密并本地存储
+
+### 账号管理命令
+
+```bash
+# 保存当前登录的账号
+ccm save-account 主号              # 保存为"主号"
+ccm save-account 备用号            # 保存为"备用号"
+
+# 在账号之间切换
+ccm switch-account 主号            # 切换到主号
+ccm switch-account 备用号          # 切换到备用号
+
+# 查看所有已保存的账号
+ccm list-accounts
+# 输出:
+# 📋 已保存的 Claude Pro 账号:
+#   - 主号 (Pro, expires: 2025-12-31, ✅ 当前)
+#   - 备用号 (Pro, expires: 2025-12-31)
+
+# 查看当前账号
+ccm current-account
+
+# 删除已保存的账号
+ccm delete-account 旧账号
+```
+
+### 快速账号切换与模型选择
+
+```bash
+# 一条命令切换账号并选择模型
+ccm opus:主号                      # 切换到主号，使用 Opus
+ccm haiku:备用号                   # 切换到备用号，使用 Haiku
+ccc opus:主号                      # 切换账号并启动 Claude Code
+ccc 备用号                         # 仅切换账号并启动（默认模型）
+```
+
+### 账号设置指南
+
+**步骤 1**：保存第一个账号
+```bash
+# 在浏览器中使用账号1登录 Claude Code
+# 启动 Claude Code 验证可以正常工作
+ccm save-account 账号1
+```
+
+**步骤 2**：保存其他账号
+```bash
+# 退出 Claude Code
+# 在浏览器中登出 claude.ai
+# 使用账号2登录
+# 再次启动 Claude Code
+ccm save-account 账号2
+```
+
+**步骤 3**：随时切换账号
+```bash
+ccm switch-account 账号1          # 无需浏览器登录！
+# 重启 Claude Code 使更改生效
+```
+
+**重要说明**：
+- Token 会自动刷新 - 在过期前无需重新登录
+- 切换账号后，需要重启 Claude Code 使更改生效
+- 账号凭证存储在 `~/.ccm_accounts`（权限 600）
+- 凭证在系统重启后依然有效
+ - Keychain 服务名默认使用 `Claude Code-credentials`。如系统中服务名不同，可通过环境变量 `CCM_KEYCHAIN_SERVICE` 指定。
+
+### Keychain 调试
+
+```bash
+ccm debug-keychain                # 查看当前 Keychain 凭证并尝试匹配保存账号
+# 若显示未找到凭证，但浏览器/IDE 已登录，可指定服务名覆盖：
+CCM_KEYCHAIN_SERVICE="Claude Code" ccm debug-keychain
+```
+
 ## 📖 使用方法
 
 ### 两种使用方式
