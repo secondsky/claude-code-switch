@@ -47,6 +47,7 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | 长文本处理 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
+| 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ MiniMax-M2 | 代码和推理 |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
@@ -149,6 +150,7 @@ CCM使用分层配置系统：
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 KIMI_API_KEY=your-moonshot-api-key
 LONGCAT_API_KEY=your-longcat-api-key
+MINIMAX_API_KEY=your-minimax-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key  # 阿里云 DashScope
 
@@ -156,6 +158,7 @@ QWEN_API_KEY=your-qwen-api-key  # 阿里云 DashScope
 DEEPSEEK_MODEL=deepseek-chat
 KIMI_MODEL=kimi-k2-turbo-preview
 LONGCAT_MODEL=LongCat-Flash-Thinking
+MINIMAX_MODEL=MiniMax-M2
 QWEN_MODEL=qwen3-max
 GLM_MODEL=glm-4.6
 CLAUDE_MODEL=claude-sonnet-4-5-20250929
@@ -192,6 +195,7 @@ ccc kimi --dangerously-skip-permissions # 传递选项给Claude Code
 # 切换到不同模型
 ccm kimi          # 切换到KIMI2
 ccm deepseek      # 切换到Deepseek
+ccm minimax       # 切换到MiniMax M2
 ccm qwen          # 切换到Qwen
 ccm glm           # 切换到GLM4.6
 ccm longcat       # 切换到LongCat
@@ -204,6 +208,7 @@ ccm pp            # 交互式PPINFRA模型选择
 ccm pp deepseek   # 直接切换到PPINFRA DeepSeek
 ccm pp glm        # 直接切换到PPINFRA GLM
 ccm pp kimi       # 直接切换到PPINFRA KIMI
+ccm pp minimax    # 直接切换到PPINFRA MiniMax M2
 ccm pp qwen       # 直接切换到PPINFRA Qwen
 
 # 启动Claude Code
@@ -223,6 +228,7 @@ ccc               # 显示ccc使用帮助
 ```bash
 # ccm 简写
 ccm ds           # deepseek的简写
+ccm mm           # minimax的简写
 ccm s            # claude sonnet的简写  
 ccm o            # opus的简写
 ccm h            # haiku的简写
@@ -292,6 +298,7 @@ CCM实现智能备用：
 - 支持的模型:
   - `kimi-k2-turbo-preview` (KIMI备用)
   - `deepseek/deepseek-v3.2-exp` (Deepseek备用)
+  - `MiniMax-M2` (MiniMax备用)
   - `qwen3-next-80b-a3b-thinking` (Qwen备用)
   - `zai-org/glm-4.6` (GLM备用)
 
@@ -371,6 +378,7 @@ cd claude-code-switch
 - [Claude](https://claude.ai) - AI助手
 - [Deepseek](https://deepseek.com) - 高效推理模型
 - [KIMI](https://kimi.moonshot.cn) - 长文本处理
+- [MiniMax](https://www.minimaxi.com) - MiniMax M2 模型
 - [Zhipu AI](https://zhipuai.cn) - GLM大模型
 - [Qwen](https://qwen.alibaba.com) - 阿里通义千问
 

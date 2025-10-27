@@ -111,6 +111,9 @@ KIMI_API_KEY=your-moonshot-api-key
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
 
+# MiniMax M2
+MINIMAX_API_KEY=your-minimax-api-key
+
 # Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
 
@@ -137,6 +140,8 @@ HAIKU_MODEL=claude-haiku-4-5
 HAIKU_SMALL_FAST_MODEL=claude-haiku-4-5
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
+MINIMAX_MODEL=MiniMax-M2
+MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 
 EOF
         echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -221,6 +226,9 @@ KIMI_API_KEY=your-moonshot-api-key
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
 
+# MiniMax M2
+MINIMAX_API_KEY=your-minimax-api-key
+
 # Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
 
@@ -247,6 +255,8 @@ HAIKU_MODEL=claude-haiku-4-5
 HAIKU_SMALL_FAST_MODEL=claude-haiku-4-5
 LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
+MINIMAX_MODEL=MiniMax-M2
+MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
 
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -309,6 +319,7 @@ show_status() {
     echo "   GLM_API_KEY: $(mask_presence GLM_API_KEY)"
     echo "   KIMI_API_KEY: $(mask_presence KIMI_API_KEY)"
     echo "   LONGCAT_API_KEY: $(mask_presence LONGCAT_API_KEY)"
+    echo "   MINIMAX_API_KEY: $(mask_presence MINIMAX_API_KEY)"
     echo "   DEEPSEEK_API_KEY: $(mask_presence DEEPSEEK_API_KEY)"
     echo "   QWEN_API_KEY: $(mask_presence QWEN_API_KEY)"
     echo "   PPINFRA_API_KEY: $(mask_presence PPINFRA_API_KEY)"
@@ -471,6 +482,44 @@ switch_to_kimi() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
+# 切换到 MiniMax M2
+switch_to_minimax() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') MiniMax M2 $(t 'model')...${NC}"
+    clean_env
+    if is_effectively_set "$MINIMAX_API_KEY"; then
+        # 官方 MiniMax 的 Anthropic 兼容端点
+        export ANTHROPIC_BASE_URL="https://api.minimax.io/anthropic"
+        export ANTHROPIC_API_URL="https://api.minimax.io/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$MINIMAX_API_KEY"
+        export ANTHROPIC_API_KEY="$MINIMAX_API_KEY"
+        export ANTHROPIC_MODEL="MiniMax-M2"
+        export ANTHROPIC_SMALL_FAST_MODEL="MiniMax-M2"
+        echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'official')）${NC}"
+    elif is_effectively_set "$PPINFRA_API_KEY"; then
+        # 备用：PPINFRA Anthropic 兼容
+        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
+        export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
+        export ANTHROPIC_MODEL="MiniMax-M2"
+        export ANTHROPIC_SMALL_FAST_MODEL="MiniMax-M2"
+        echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'ppinfra_backup')）${NC}"
+    else
+        # 默认体验密钥
+        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
+        export ANTHROPIC_API_KEY="$hidden_key"
+        export ANTHROPIC_MODEL="MiniMax-M2"
+        export ANTHROPIC_SMALL_FAST_MODEL="MiniMax-M2"
+        echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'default_experience_key')）${NC}"
+    fi
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+}
+
 # 切换到 Qwen（阿里云官方优先，缺省走 PPINFRA）
 switch_to_qwen() {
     echo -e "${YELLOW}🔄 $(t 'switching_to') Qwen $(t 'model')...${NC}"
@@ -530,11 +579,11 @@ switch_to_ppinfra() {
         if [[ "$no_color" == "true" ]]; then
             echo "❌ $(t 'model_not_specified')"
             echo "💡 $(t 'usage_example'): ccm pp glm"
-            echo "💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen"
+            echo "💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen, minimax"
         else
             echo -e "${RED}❌ $(t 'model_not_specified')${NC}"
             echo -e "${YELLOW}💡 $(t 'usage_example'): ccm pp glm${NC}"
-            echo -e "${YELLOW}💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen${NC}"
+            echo -e "${YELLOW}💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen, minimax${NC}"
         fi
         return 1
     fi
@@ -593,13 +642,25 @@ switch_to_ppinfra() {
             echo "export ANTHROPIC_MODEL='qwen3-next-80b-a3b-thinking'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='qwen3-next-80b-a3b-thinking'"
             ;;
+        "minimax"|"mm")
+            if [[ "$no_color" == "true" ]]; then
+                echo "✅ $(t 'switched_to') MiniMax M2（PPINFRA）" >&2
+            else
+                echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（PPINFRA）${NC}" >&2
+            fi
+            echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+            echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+            echo "export ANTHROPIC_AUTH_TOKEN='$ppinfra_key'"
+            echo "export ANTHROPIC_MODEL='MiniMax-M2'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='MiniMax-M2'"
+            ;;
         *)
             if [[ "$no_color" == "true" ]]; then
                 echo "❌ $(t 'unknown_ppinfra_model'): $target"
-                echo "💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen"
+                echo "💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen, minimax"
             else
                 echo -e "${RED}❌ $(t 'unknown_ppinfra_model'): $target${NC}"
-                echo -e "${YELLOW}💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen${NC}"
+                echo -e "${YELLOW}💡 $(t 'available_ppinfra_models'): deepseek, glm, kimi, qwen, minimax${NC}"
             fi
             return 1
             ;;
@@ -619,6 +680,7 @@ show_help() {
     echo "  deepseek, ds       - env deepseek"
     echo "  kimi, kimi2        - env kimi"
     echo "  longcat, lc        - env longcat"
+    echo "  minimax, mm        - env minimax"
     echo "  qwen               - env qwen"
     echo "  glm, glm4          - env glm"
     echo "  claude, sonnet, s  - env claude"
@@ -628,7 +690,7 @@ show_help() {
     echo -e "${YELLOW}$(t 'tool_options'):${NC}"
     echo "  status, st       - $(t 'show_current_config')"
     echo "  env [model]      - $(t 'output_export_only')"
-    echo "  pp [model]       - Switch to PPINFRA service (deepseek/glm/kimi/qwen)"
+    echo "  pp [model]       - Switch to PPINFRA service (deepseek/glm/kimi/qwen/minimax)"
     echo "  config, cfg      - $(t 'edit_config_file')"
     echo "  help, h          - $(t 'show_help')"
     echo ""
@@ -640,6 +702,7 @@ show_help() {
     echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
     echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
+    echo "  🎯 MiniMax M2          - 官方：MiniMax-M2 ｜ 备用：MiniMax-M2 (PPINFRA)"
     echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
     echo "  🇨🇳 GLM4.6             - 官方：glm-4.6 / glm-4.5-air"
     echo "  🧠 Claude Sonnet 4.5   - claude-sonnet-4-5-20250929"
@@ -656,6 +719,8 @@ ensure_model_override_defaults() {
         "KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview"
         "LONGCAT_MODEL=LongCat-Flash-Thinking"
         "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
+        "MINIMAX_MODEL=MiniMax-M2"
+        "MINIMAX_SMALL_FAST_MODEL=MiniMax-M2"
         "QWEN_MODEL=qwen3-max"
         "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct"
         "GLM_MODEL=glm-4.6"
@@ -949,8 +1014,48 @@ emit_env_exports() {
                 return 1
             fi
             ;;
+        "minimax"|"mm")
+            if is_effectively_set "$MINIMAX_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.minimax.io/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.minimax.io/anthropic'"
+                echo "if [ -z \"\${MINIMAX_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${MINIMAX_API_KEY}\""
+                local mm_model="${MINIMAX_MODEL:-MiniMax-M2}"
+                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-MiniMax-M2}"
+                echo "export ANTHROPIC_MODEL='${mm_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
+            elif is_effectively_set "$PPINFRA_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+                echo "if [ -z \"\${MINIMAX_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
+                local mm_model="${MINIMAX_MODEL:-MiniMax-M2}"
+                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-MiniMax-M2}"
+                echo "export ANTHROPIC_MODEL='${mm_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
+            else
+                # 默认体验密钥
+                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
+                local mm_model="${MINIMAX_MODEL:-MiniMax-M2}"
+                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-MiniMax-M2}"
+                echo "export ANTHROPIC_MODEL='${mm_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
+            fi
+            ;;
         *)
-            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus]" 1>&2
+            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax]" 1>&2
             return 1
             ;;
     esac
@@ -977,6 +1082,9 @@ main() {
             ;;
         "longcat"|"lc")
             emit_env_exports longcat
+            ;;
+        "minimax"|"mm")
+            emit_env_exports minimax
             ;;
         "glm"|"glm4"|"glm4.6")
             emit_env_exports glm

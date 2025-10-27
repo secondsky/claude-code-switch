@@ -47,6 +47,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | Long text processing |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
+| 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ MiniMax-M2 | Code & reasoning |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
@@ -149,6 +150,7 @@ CCM uses a hierarchical configuration system:
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 KIMI_API_KEY=your-moonshot-api-key
 LONGCAT_API_KEY=your-longcat-api-key
+MINIMAX_API_KEY=your-minimax-api-key
 GLM_API_KEY=your-glm-api-key
 QWEN_API_KEY=your-qwen-api-key  # Alibaba Cloud DashScope
 
@@ -156,6 +158,7 @@ QWEN_API_KEY=your-qwen-api-key  # Alibaba Cloud DashScope
 DEEPSEEK_MODEL=deepseek-chat
 KIMI_MODEL=kimi-k2-turbo-preview
 LONGCAT_MODEL=LongCat-Flash-Thinking
+MINIMAX_MODEL=MiniMax-M2
 QWEN_MODEL=qwen3-max
 GLM_MODEL=glm-4.6
 CLAUDE_MODEL=claude-sonnet-4-5-20250929
@@ -192,6 +195,7 @@ ccc kimi --dangerously-skip-permissions # Pass options to Claude Code
 # Switch to different models
 ccm kimi          # Switch to KIMI2
 ccm deepseek      # Switch to Deepseek
+ccm minimax       # Switch to MiniMax M2
 ccm qwen          # Switch to Qwen
 ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
@@ -204,6 +208,7 @@ ccm pp            # Interactive PPINFRA model selection
 ccm pp deepseek   # Direct switch to PPINFRA DeepSeek
 ccm pp glm        # Direct switch to PPINFRA GLM
 ccm pp kimi       # Direct switch to PPINFRA KIMI
+ccm pp minimax    # Direct switch to PPINFRA MiniMax M2
 ccm pp qwen       # Direct switch to PPINFRA Qwen
 
 # Launch Claude Code
@@ -223,7 +228,8 @@ ccc               # Show ccc usage help
 ```bash
 # ccm shortcuts
 ccm ds           # Short for deepseek
-ccm s            # Short for claude sonnet  
+ccm mm           # Short for minimax
+ccm s            # Short for claude sonnet
 ccm o            # Short for opus
 ccm h            # Short for haiku
 ccm st           # Short for status
@@ -292,6 +298,7 @@ CCM implements intelligent fallback:
 - Supported models:
   - `kimi-k2-turbo-preview` (KIMI fallback)
   - `deepseek/deepseek-v3.2-exp` (Deepseek fallback)
+  - `MiniMax-M2` (MiniMax fallback)
   - `qwen3-next-80b-a3b-thinking` (Qwen fallback)
   - `zai-org/glm-4.6` (GLM fallback)
 
@@ -371,6 +378,7 @@ This project is licensed under the [MIT License](LICENSE).
 - [Claude](https://claude.ai) - AI Assistant
 - [Deepseek](https://deepseek.com) - Efficient reasoning model
 - [KIMI](https://kimi.moonshot.cn) - Long text processing
+- [MiniMax](https://www.minimaxi.com) - MiniMax M2 model
 - [Zhipu AI](https://zhipuai.cn) - GLM large model
 - [Qwen](https://qwen.alibaba.com) - Alibaba Tongyi Qianwen
 
