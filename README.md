@@ -48,6 +48,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ MiniMax-M2 | Code & reasoning |
+| 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ Official only | StreamLake AI |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
@@ -197,6 +198,7 @@ ccm kimi          # Switch to KIMI2
 ccm deepseek      # Switch to Deepseek
 ccm minimax       # Switch to MiniMax M2
 ccm qwen          # Switch to Qwen
+ccm kat           # Switch to StreamLake (KAT)
 ccm glm           # Switch to GLM4.6
 ccm longcat       # Switch to LongCat
 ccm claude        # Switch to Claude Sonnet 4.5
@@ -215,6 +217,7 @@ ccm pp qwen       # Direct switch to PPINFRA Qwen
 ccc deepseek      # Switch to DeepSeek and launch
 ccc pp glm        # Switch to PPINFRA GLM and launch
 ccc opus          # Switch to Claude Opus and launch
+ccc kat           # Switch to StreamLake (KAT) and launch
 
 # Utility commands
 ccm status        # View current status (masked)
@@ -237,6 +240,7 @@ ccm st           # Short for status
 # ccc shortcuts
 ccc ds           # Launch with DeepSeek
 ccc pp ds        # Launch with PPINFRA DeepSeek
+ccc kat          # Launch with StreamLake (KAT)
 ```
 
 ### Usage Examples

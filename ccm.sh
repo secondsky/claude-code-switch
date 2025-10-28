@@ -560,6 +560,40 @@ switch_to_qwen() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
+# 切换到StreamLake AI (KAT)
+switch_to_kat() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') StreamLake AI (KAT) $(t 'model')...${NC}"
+    clean_env
+    if is_effectively_set "$KAT_API_KEY"; then
+        # 获取用户的endpoint ID，默认为配置中的值或环境变量
+        local endpoint_id="${KAT_ENDPOINT_ID:-ep-default}"
+        # StreamLake AI KAT 端点格式：https://vanchin.streamlake.ai/api/gateway/v1/endpoints/{endpoint_id}/claude-code-proxy
+        export ANTHROPIC_BASE_URL="https://vanchin.streamlake.ai/api/gateway/v1/endpoints/${endpoint_id}/claude-code-proxy"
+        export ANTHROPIC_API_URL="https://vanchin.streamlake.ai/api/gateway/v1/endpoints/${endpoint_id}/claude-code-proxy"
+        export ANTHROPIC_AUTH_TOKEN="$KAT_API_KEY"
+        export ANTHROPIC_API_KEY="$KAT_API_KEY"
+        # 使用 KAT-Coder 模型
+        local kat_model="${KAT_MODEL:-KAT-Coder}"
+        local kat_small="${KAT_SMALL_FAST_MODEL:-KAT-Coder}"
+        export ANTHROPIC_MODEL="$kat_model"
+        export ANTHROPIC_SMALL_FAST_MODEL="$kat_small"
+        echo -e "${GREEN}✅ $(t 'switched_to') StreamLake AI (KAT)（$(t 'official')）${NC}"
+    else
+        echo -e "${RED}❌ $(t 'missing_api_key'): KAT_API_KEY${NC}"
+        echo "$(t 'please_set_in_config'): KAT_API_KEY"
+        echo ""
+        echo "$(t 'example_config'):"
+        echo "  export KAT_API_KEY='YOUR_API_KEY'"
+        echo "  export KAT_ENDPOINT_ID='ep-xxx-xxx'"
+        echo ""
+        echo "$(t 'get_endpoint_id_from'): https://www.streamlake.ai/document/DOC/mg6k6nlp8j6qxicx4c9"
+        return 1
+    fi
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+}
+
 # 切换到PPINFRA服务
 switch_to_ppinfra() {
     local target="${1:-}"
@@ -679,6 +713,7 @@ show_help() {
     echo -e "${YELLOW}$(t 'model_options'):${NC}"
     echo "  deepseek, ds       - env deepseek"
     echo "  kimi, kimi2        - env kimi"
+    echo "  kat                - env kat"
     echo "  longcat, lc        - env longcat"
     echo "  minimax, mm        - env minimax"
     echo "  qwen               - env qwen"
@@ -701,6 +736,7 @@ show_help() {
     echo -e "${YELLOW}支持的模型:${NC}"
     echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
+    echo "  🌊 StreamLake (KAT)    - 官方：KAT-Coder"
     echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
     echo "  🎯 MiniMax M2          - 官方：MiniMax-M2 ｜ 备用：MiniMax-M2 (PPINFRA)"
     echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
@@ -717,6 +753,9 @@ ensure_model_override_defaults() {
         "DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat"
         "KIMI_MODEL=kimi-k2-turbo-preview"
         "KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview"
+        "KAT_MODEL=KAT-Coder"
+        "KAT_SMALL_FAST_MODEL=KAT-Coder"
+        "KAT_ENDPOINT_ID=ep-default"
         "LONGCAT_MODEL=LongCat-Flash-Thinking"
         "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
         "MINIMAX_MODEL=MiniMax-M2"
@@ -1054,8 +1093,34 @@ emit_env_exports() {
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
             fi
             ;;
+        "kat")
+            if ! is_effectively_set "$KAT_API_KEY"; then
+                # 兜底：直接 source 配置文件一次
+                if [ -f "$HOME/.ccm_config" ]; then . "$HOME/.ccm_config" >/dev/null 2>&1; fi
+            fi
+            if is_effectively_set "$KAT_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                # 使用用户的 endpoint ID，默认为 ep-default
+                local kat_endpoint="${KAT_ENDPOINT_ID:-ep-default}"
+                echo "export ANTHROPIC_BASE_URL='https://vanchin.streamlake.ai/api/gateway/v1/endpoints/${kat_endpoint}/claude-code-proxy'"
+                echo "export ANTHROPIC_API_URL='https://vanchin.streamlake.ai/api/gateway/v1/endpoints/${kat_endpoint}/claude-code-proxy'"
+                echo "if [ -z \"\${KAT_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${KAT_API_KEY}\""
+                local kat_model="${KAT_MODEL:-KAT-Coder}"
+                local kat_small="${KAT_SMALL_FAST_MODEL:-KAT-Coder}"
+                echo "export ANTHROPIC_MODEL='${kat_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kat_small}'"
+            else
+                echo "# ❌ $(t 'missing_api_key'): KAT_API_KEY" 1>&2
+                echo "# $(t 'please_set_in_config'): KAT_API_KEY" 1>&2
+                echo "# $(t 'get_endpoint_id_from'): https://www.streamlake.ai/document/DOC/mg6k6nlp8j6qxicx4c9" 1>&2
+                return 1
+            fi
+            ;;
         *)
-            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax]" 1>&2
+            echo "# $(t 'usage'): $(basename "$0") env [deepseek|kimi|qwen|glm|claude|opus|minimax|kat]" 1>&2
             return 1
             ;;
     esac
@@ -1079,6 +1144,9 @@ main() {
             ;;
         "qwen")
             emit_env_exports qwen
+            ;;
+        "kat")
+            emit_env_exports kat
             ;;
         "longcat"|"lc")
             emit_env_exports longcat

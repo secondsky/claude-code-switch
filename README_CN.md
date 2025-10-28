@@ -48,6 +48,7 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ MiniMax-M2 | 代码和推理 |
+| 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ 仅官方 | StreamLake AI |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
@@ -197,6 +198,7 @@ ccm kimi          # 切换到KIMI2
 ccm deepseek      # 切换到Deepseek
 ccm minimax       # 切换到MiniMax M2
 ccm qwen          # 切换到Qwen
+ccm kat           # 切换到StreamLake (KAT)
 ccm glm           # 切换到GLM4.6
 ccm longcat       # 切换到LongCat
 ccm claude        # 切换到Claude Sonnet 4.5
@@ -215,6 +217,7 @@ ccm pp qwen       # 直接切换到PPINFRA Qwen
 ccc deepseek      # 切换到DeepSeek并启动
 ccc pp glm        # 切换到PPINFRA GLM并启动
 ccc opus          # 切换到Claude Opus并启动
+ccc kat           # 切换到StreamLake (KAT)并启动
 
 # 工具命令
 ccm status        # 查看当前状态（脱敏）
@@ -237,6 +240,7 @@ ccm st           # status的简写
 # ccc 简写
 ccc ds           # 使用DeepSeek启动
 ccc pp ds        # 使用PPINFRA DeepSeek启动
+ccc kat          # 使用StreamLake (KAT)启动
 ```
 
 ### 使用示例
