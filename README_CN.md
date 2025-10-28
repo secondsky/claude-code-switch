@@ -47,7 +47,7 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | 长文本处理 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
-| 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ MiniMax-M2 | 代码和推理 |
+| 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | 代码和推理 |
 | 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ 仅官方 | StreamLake AI |
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
@@ -302,7 +302,8 @@ CCM实现智能备用：
 - 支持的模型:
   - `kimi-k2-turbo-preview` (KIMI备用)
   - `deepseek/deepseek-v3.2-exp` (Deepseek备用)
-  - `MiniMax-M2` (MiniMax备用)
+  - `MiniMax-M2` (MiniMax官方)
+  - `minimax/minimax-m2` (MiniMax PPINFRA备用)
   - `qwen3-next-80b-a3b-thinking` (Qwen备用)
   - `zai-org/glm-4.6` (GLM备用)
 

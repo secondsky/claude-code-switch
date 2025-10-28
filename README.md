@@ -47,7 +47,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | Long text processing |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
-| 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ MiniMax-M2 | Code & reasoning |
+| 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | Code & reasoning |
 | 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ Official only | StreamLake AI |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
@@ -302,7 +302,8 @@ CCM implements intelligent fallback:
 - Supported models:
   - `kimi-k2-turbo-preview` (KIMI fallback)
   - `deepseek/deepseek-v3.2-exp` (Deepseek fallback)
-  - `MiniMax-M2` (MiniMax fallback)
+  - `MiniMax-M2` (MiniMax official)
+  - `minimax/minimax-m2` (MiniMax PPINFRA fallback)
   - `qwen3-next-80b-a3b-thinking` (Qwen fallback)
   - `zai-org/glm-4.6` (GLM fallback)
 

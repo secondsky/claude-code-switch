@@ -492,8 +492,8 @@ switch_to_minimax() {
         export ANTHROPIC_API_URL="https://api.minimax.io/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$MINIMAX_API_KEY"
         export ANTHROPIC_API_KEY="$MINIMAX_API_KEY"
-        export ANTHROPIC_MODEL="MiniMax-M2"
-        export ANTHROPIC_SMALL_FAST_MODEL="MiniMax-M2"
+        export ANTHROPIC_MODEL="minimax/minimax-m2"
+        export ANTHROPIC_SMALL_FAST_MODEL="minimax/minimax-m2"
         echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'official')）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         # 备用：PPINFRA Anthropic 兼容
@@ -501,8 +501,8 @@ switch_to_minimax() {
         export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
-        export ANTHROPIC_MODEL="MiniMax-M2"
-        export ANTHROPIC_SMALL_FAST_MODEL="MiniMax-M2"
+        export ANTHROPIC_MODEL="minimax/minimax-m2"
+        export ANTHROPIC_SMALL_FAST_MODEL="minimax/minimax-m2"
         echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'ppinfra_backup')）${NC}"
     else
         # 默认体验密钥
@@ -511,8 +511,8 @@ switch_to_minimax() {
         export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$hidden_key"
         export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="MiniMax-M2"
-        export ANTHROPIC_SMALL_FAST_MODEL="MiniMax-M2"
+        export ANTHROPIC_MODEL="minimax/minimax-m2"
+        export ANTHROPIC_SMALL_FAST_MODEL="minimax/minimax-m2"
         echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'default_experience_key')）${NC}"
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
@@ -1062,8 +1062,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.minimax.io/anthropic'"
                 echo "if [ -z \"\${MINIMAX_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${MINIMAX_API_KEY}\""
-                local mm_model="${MINIMAX_MODEL:-MiniMax-M2}"
-                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-MiniMax-M2}"
+                local mm_model="${MINIMAX_MODEL:-minimax/minimax-m2}"
+                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-minimax/minimax-m2}"
                 echo "export ANTHROPIC_MODEL='${mm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
@@ -1074,8 +1074,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
                 echo "if [ -z \"\${MINIMAX_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                local mm_model="${MINIMAX_MODEL:-MiniMax-M2}"
-                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-MiniMax-M2}"
+                local mm_model="${MINIMAX_MODEL:-minimax/minimax-m2}"
+                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-minimax/minimax-m2}"
                 echo "export ANTHROPIC_MODEL='${mm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
             else
@@ -1087,8 +1087,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
                 echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local mm_model="${MINIMAX_MODEL:-MiniMax-M2}"
-                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-MiniMax-M2}"
+                local mm_model="${MINIMAX_MODEL:-minimax/minimax-m2}"
+                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-minimax/minimax-m2}"
                 echo "export ANTHROPIC_MODEL='${mm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
             fi
