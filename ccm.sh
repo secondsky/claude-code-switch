@@ -685,8 +685,8 @@ switch_to_ppinfra() {
             echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
             echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
             echo "export ANTHROPIC_AUTH_TOKEN='$ppinfra_key'"
-            echo "export ANTHROPIC_MODEL='MiniMax-M2'"
-            echo "export ANTHROPIC_SMALL_FAST_MODEL='MiniMax-M2'"
+            echo "export ANTHROPIC_MODEL='minimax/minimax-m2'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='minimax/minimax-m2'"
             ;;
         *)
             if [[ "$no_color" == "true" ]]; then
