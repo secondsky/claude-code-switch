@@ -5,7 +5,7 @@
 # 功能: 在不同AI模型之间快速切换
 # 支持: Claude, Deepseek, GLM4.6, KIMI2
 # 作者: Peng
-# 版本: 2.0.0
+# 版本: 2.2.0
 ############################################################
 
 # 脚本颜色定义
@@ -17,6 +17,9 @@ NC='\033[0m' # No Color
 
 # 配置文件路径
 CONFIG_FILE="$HOME/.ccm_config"
+ACCOUNTS_FILE="$HOME/.ccm_accounts"
+# Keychain service name (override with CCM_KEYCHAIN_SERVICE)
+KEYCHAIN_SERVICE="${CCM_KEYCHAIN_SERVICE:-Claude Code-credentials}"
 
 # 多语言支持
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
@@ -306,6 +309,329 @@ mask_presence() {
     fi
 }
 
+# ============================================
+# Claude Pro 账号管理功能
+# ============================================
+
+# 从 macOS Keychain 读取 Claude Code 凭证
+read_keychain_credentials() {
+    local credentials
+    local -a services=(
+        "$KEYCHAIN_SERVICE"
+        "Claude Code - credentials"
+        "Claude Code"
+        "claude"
+        "claude.ai"
+    )
+    for svc in "${services[@]}"; do
+        credentials=$(security find-generic-password -s "$svc" -w 2>/dev/null)
+        if [[ $? -eq 0 && -n "$credentials" ]]; then
+            KEYCHAIN_SERVICE="$svc"
+            echo "$credentials"
+            return 0
+        fi
+    done
+    echo ""
+    return 1
+}
+
+# 写入凭证到 macOS Keychain
+write_keychain_credentials() {
+    local credentials="$1"
+    local username="$USER"
+
+    # 先删除现有的凭证
+    security delete-generic-password -s "$KEYCHAIN_SERVICE" >/dev/null 2>&1
+
+    # 添加新凭证
+    security add-generic-password -a "$username" -s "$KEYCHAIN_SERVICE" -w "$credentials" >/dev/null 2>&1
+    local result=$?
+
+    if [[ $result -eq 0 ]]; then
+        echo -e "${BLUE}🔑 凭证已写入 Keychain${NC}" >&2
+    else
+        echo -e "${RED}❌ 凭证写入 Keychain 失败 (错误码: $result)${NC}" >&2
+    fi
+
+    return $result
+}
+
+# 调试函数：验证 Keychain 中的凭证
+debug_keychain_credentials() {
+    echo -e "${BLUE}🔍 调试：检查 Keychain 中的凭证${NC}"
+
+    local credentials=$(read_keychain_credentials)
+    if [[ -z "$credentials" ]]; then
+        echo -e "${RED}❌ Keychain 中没有凭证${NC}"
+        return 1
+    fi
+
+    # 提取凭证信息
+    local subscription=$(echo "$credentials" | grep -o '"subscriptionType":"[^"]*"' | cut -d'"' -f4)
+    local expires=$(echo "$credentials" | grep -o '"expiresAt":[0-9]*' | cut -d':' -f2)
+    local access_token_preview=$(echo "$credentials" | grep -o '"accessToken":"[^"]*"' | cut -d'"' -f4 | head -c 20)
+
+    echo -e "${GREEN}✅ 找到凭证：${NC}"
+    echo "   服务名: $KEYCHAIN_SERVICE"
+    echo "   订阅类型: ${subscription:-Unknown}"
+    if [[ -n "$expires" ]]; then
+        local expires_str=$(date -r $((expires / 1000)) "+%Y-%m-%d %H:%M" 2>/dev/null || echo "Unknown")
+        echo "   过期时间: $expires_str"
+    fi
+    echo "   Token 预览: ${access_token_preview}..."
+
+    # 尝试匹配保存的账号
+    if [[ -f "$ACCOUNTS_FILE" ]]; then
+        echo -e "${BLUE}🔍 尝试匹配保存的账号...${NC}"
+        while IFS=': ' read -r name encoded; do
+            name=$(echo "$name" | tr -d '"')
+            encoded=$(echo "$encoded" | tr -d '"')
+            local saved_creds=$(echo "$encoded" | base64 -d 2>/dev/null)
+            if [[ "$saved_creds" == "$credentials" ]]; then
+                echo -e "${GREEN}✅ 匹配到账号: $name${NC}"
+                return 0
+            fi
+        done < <(grep --color=never -o '"[^"]*": *"[^"]*"' "$ACCOUNTS_FILE")
+        echo -e "${YELLOW}⚠️  没有匹配到任何保存的账号${NC}"
+    fi
+}
+
+# 初始化账号配置文件
+init_accounts_file() {
+    if [[ ! -f "$ACCOUNTS_FILE" ]]; then
+        echo "{}" > "$ACCOUNTS_FILE"
+        chmod 600 "$ACCOUNTS_FILE"
+    fi
+}
+
+# 保存当前账号
+save_account() {
+    local account_name="$1"
+
+    if [[ -z "$account_name" ]]; then
+        echo -e "${RED}❌ $(t 'account_name_required')${NC}" >&2
+        echo -e "${YELLOW}💡 $(t 'usage'): ccm save-account <name>${NC}" >&2
+        return 1
+    fi
+
+    # 从 Keychain 读取当前凭证
+    local credentials
+    credentials=$(read_keychain_credentials)
+    if [[ -z "$credentials" ]]; then
+        echo -e "${RED}❌ $(t 'no_credentials_found')${NC}" >&2
+        echo -e "${YELLOW}💡 $(t 'please_login_first')${NC}" >&2
+        return 1
+    fi
+
+    # 初始化账号文件
+    init_accounts_file
+
+    # 使用纯 Bash 解析和保存（不依赖 jq）
+    local temp_file=$(mktemp)
+    local existing_accounts=""
+
+    if [[ -f "$ACCOUNTS_FILE" ]]; then
+        existing_accounts=$(cat "$ACCOUNTS_FILE")
+    fi
+
+    # 简单的 JSON 更新：如果是空文件或只有 {}，直接写入
+    if [[ "$existing_accounts" == "{}" || -z "$existing_accounts" ]]; then
+        local encoded_creds=$(echo "$credentials" | base64)
+        cat > "$ACCOUNTS_FILE" << EOF
+{
+  "$account_name": "$encoded_creds"
+}
+EOF
+    else
+        # 读取现有账号，添加新账号
+        # 检查账号是否已存在
+        if grep -q "\"$account_name\":" "$ACCOUNTS_FILE"; then
+            # 更新现有账号
+            local encoded_creds=$(echo "$credentials" | base64)
+            # 使用 sed 替换现有条目
+            sed -i '' "s/\"$account_name\": *\"[^\"]*\"/\"$account_name\": \"$encoded_creds\"/" "$ACCOUNTS_FILE"
+        else
+            # 添加新账号
+            local encoded_creds=$(echo "$credentials" | base64)
+            # 移除最后的 } (使用 macOS 兼容的命令)
+            sed '$d' "$ACCOUNTS_FILE" > "$temp_file"
+            # 检查是否需要添加逗号
+            if grep -q '"' "$temp_file"; then
+                echo "," >> "$temp_file"
+            fi
+            echo "  \"$account_name\": \"$encoded_creds\"" >> "$temp_file"
+            echo "}" >> "$temp_file"
+            mv "$temp_file" "$ACCOUNTS_FILE"
+        fi
+    fi
+
+    chmod 600 "$ACCOUNTS_FILE"
+
+    # 提取订阅类型用于显示
+    local subscription_type=$(echo "$credentials" | grep -o '"subscriptionType":"[^"]*"' | cut -d'"' -f4)
+    echo -e "${GREEN}✅ $(t 'account_saved'): $account_name${NC}"
+    echo -e "   $(t 'subscription_type'): ${subscription_type:-Unknown}"
+
+    rm -f "$temp_file"
+}
+
+# 切换到指定账号
+switch_account() {
+    local account_name="$1"
+
+    if [[ -z "$account_name" ]]; then
+        echo -e "${RED}❌ $(t 'account_name_required')${NC}" >&2
+        echo -e "${YELLOW}💡 $(t 'usage'): ccm switch-account <name>${NC}" >&2
+        return 1
+    fi
+
+    if [[ ! -f "$ACCOUNTS_FILE" ]]; then
+        echo -e "${RED}❌ $(t 'no_accounts_found')${NC}" >&2
+        echo -e "${YELLOW}💡 $(t 'save_account_first')${NC}" >&2
+        return 1
+    fi
+
+    # 从文件中读取账号凭证
+    local encoded_creds=$(grep -o "\"$account_name\": *\"[^\"]*\"" "$ACCOUNTS_FILE" | cut -d'"' -f4)
+
+    if [[ -z "$encoded_creds" ]]; then
+        echo -e "${RED}❌ $(t 'account_not_found'): $account_name${NC}" >&2
+        echo -e "${YELLOW}💡 $(t 'use_list_accounts')${NC}" >&2
+        return 1
+    fi
+
+    # 解码凭证
+    local credentials=$(echo "$encoded_creds" | base64 -d)
+
+    # 写入 Keychain
+    if write_keychain_credentials "$credentials"; then
+        echo -e "${GREEN}✅ $(t 'account_switched'): $account_name${NC}"
+        echo -e "${YELLOW}⚠️  $(t 'please_restart_claude_code')${NC}"
+    else
+        echo -e "${RED}❌ $(t 'failed_to_switch_account')${NC}" >&2
+        return 1
+    fi
+}
+
+# 列出所有已保存的账号
+list_accounts() {
+    if [[ ! -f "$ACCOUNTS_FILE" ]]; then
+        echo -e "${YELLOW}$(t 'no_accounts_saved')${NC}"
+        echo -e "${YELLOW}💡 $(t 'use_save_account')${NC}"
+        return 0
+    fi
+
+    echo -e "${BLUE}📋 $(t 'saved_accounts'):${NC}"
+
+    # 读取并解析账号列表
+    local current_creds=$(read_keychain_credentials)
+
+    grep --color=never -o '"[^"]*": *"[^"]*"' "$ACCOUNTS_FILE" | while IFS=': ' read -r name encoded; do
+        # 清理引号
+        name=$(echo "$name" | tr -d '"')
+        encoded=$(echo "$encoded" | tr -d '"')
+
+        # 解码并提取信息
+        local creds=$(echo "$encoded" | base64 -d 2>/dev/null)
+        local subscription=$(echo "$creds" | grep -o '"subscriptionType":"[^"]*"' | cut -d'"' -f4)
+        local expires=$(echo "$creds" | grep -o '"expiresAt":[0-9]*' | cut -d':' -f2)
+
+        # 检查是否是当前账号
+        local is_current=""
+        if [[ "$creds" == "$current_creds" ]]; then
+            is_current=" ${GREEN}✅ ($(t 'active'))${NC}"
+        fi
+
+        # 格式化过期时间
+        local expires_str=""
+        if [[ -n "$expires" ]]; then
+            expires_str=$(date -r $((expires / 1000)) "+%Y-%m-%d %H:%M" 2>/dev/null || echo "Unknown")
+        fi
+
+        echo -e "   - ${YELLOW}$name${NC} (${subscription:-Unknown}${expires_str:+, expires: $expires_str})$is_current"
+    done
+}
+
+# 删除已保存的账号
+delete_account() {
+    local account_name="$1"
+
+    if [[ -z "$account_name" ]]; then
+        echo -e "${RED}❌ $(t 'account_name_required')${NC}" >&2
+        echo -e "${YELLOW}💡 $(t 'usage'): ccm delete-account <name>${NC}" >&2
+        return 1
+    fi
+
+    if [[ ! -f "$ACCOUNTS_FILE" ]]; then
+        echo -e "${RED}❌ $(t 'no_accounts_found')${NC}" >&2
+        return 1
+    fi
+
+    # 检查账号是否存在
+    if ! grep -q "\"$account_name\":" "$ACCOUNTS_FILE"; then
+        echo -e "${RED}❌ $(t 'account_not_found'): $account_name${NC}" >&2
+        return 1
+    fi
+
+    # 删除账号（使用临时文件）
+    local temp_file=$(mktemp)
+    grep -v "\"$account_name\":" "$ACCOUNTS_FILE" > "$temp_file"
+
+    # 清理可能的逗号问题
+    sed -i '' 's/,\s*}/}/g' "$temp_file" 2>/dev/null || sed -i 's/,\s*}/}/g' "$temp_file"
+    sed -i '' 's/}\s*,/}/g' "$temp_file" 2>/dev/null || sed -i 's/}\s*,/}/g' "$temp_file"
+
+    mv "$temp_file" "$ACCOUNTS_FILE"
+    chmod 600 "$ACCOUNTS_FILE"
+
+    echo -e "${GREEN}✅ $(t 'account_deleted'): $account_name${NC}"
+}
+
+# 显示当前账号信息
+get_current_account() {
+    local credentials=$(read_keychain_credentials)
+
+    if [[ -z "$credentials" ]]; then
+        echo -e "${YELLOW}$(t 'no_current_account')${NC}"
+        echo -e "${YELLOW}💡 $(t 'please_login_or_switch')${NC}"
+        return 1
+    fi
+
+    # 提取信息
+    local subscription=$(echo "$credentials" | grep -o '"subscriptionType":"[^"]*"' | cut -d'"' -f4)
+    local expires=$(echo "$credentials" | grep -o '"expiresAt":[0-9]*' | cut -d':' -f2)
+    local access_token=$(echo "$credentials" | grep -o '"accessToken":"[^"]*"' | cut -d'"' -f4)
+
+    # 格式化过期时间
+    local expires_str=""
+    if [[ -n "$expires" ]]; then
+        expires_str=$(date -r $((expires / 1000)) "+%Y-%m-%d %H:%M" 2>/dev/null || echo "Unknown")
+    fi
+
+    # 查找账号名称
+    local account_name="Unknown"
+    if [[ -f "$ACCOUNTS_FILE" ]]; then
+        while IFS=': ' read -r name encoded; do
+            name=$(echo "$name" | tr -d '"')
+            encoded=$(echo "$encoded" | tr -d '"')
+            local saved_creds=$(echo "$encoded" | base64 -d 2>/dev/null)
+            if [[ "$saved_creds" == "$credentials" ]]; then
+                account_name="$name"
+                break
+            fi
+        done < <(grep --color=never -o '"[^"]*": *"[^"]*"' "$ACCOUNTS_FILE")
+    fi
+
+    echo -e "${BLUE}📊 $(t 'current_account_info'):${NC}"
+    echo "   $(t 'account_name'): ${account_name}"
+    echo "   $(t 'subscription_type'): ${subscription:-Unknown}"
+    if [[ -n "$expires_str" ]]; then
+        echo "   $(t 'token_expires'): ${expires_str}"
+    fi
+    echo -n "   $(t 'access_token'): "
+    mask_token "$access_token"
+}
+
 # 显示当前状态（脱敏）
 show_status() {
     echo -e "${BLUE}📊 $(t 'current_model_config'):${NC}"
@@ -376,33 +702,75 @@ switch_to_deepseek() {
 
 # 切换到Claude Sonnet
 switch_to_claude() {
+    local account_name="$1"
+
     echo -e "${YELLOW}🔄 切换到 Claude Sonnet 4.5...${NC}"
+
+    # 如果指定了账号，先切换账号
+    if [[ -n "$account_name" ]]; then
+        echo -e "${BLUE}📝 切换到账号: $account_name${NC}"
+        if ! switch_account "$account_name"; then
+            return 1
+        fi
+    fi
+
     clean_env
-    export ANTHROPIC_MODEL="claude-sonnet-4-5-20250929"
-    export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-5-20250929"
+    export ANTHROPIC_MODEL="${CLAUDE_MODEL:-claude-sonnet-4-5-20250929}"
+    export ANTHROPIC_SMALL_FAST_MODEL="${CLAUDE_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
     echo -e "${GREEN}✅ 已切换到 Claude Sonnet 4.5 (使用 Claude Pro 订阅)${NC}"
+    if [[ -n "$account_name" ]]; then
+        echo "   $(t 'account'): $account_name"
+    fi
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
 # 切换到Claude Opus
 switch_to_opus() {
+    local account_name="$1"
+
     echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Opus 4.1...${NC}"
+
+    # 如果指定了账号，先切换账号
+    if [[ -n "$account_name" ]]; then
+        echo -e "${BLUE}📝 切换到账号: $account_name${NC}"
+        if ! switch_account "$account_name"; then
+            return 1
+        fi
+    fi
+
     clean_env
-    export ANTHROPIC_MODEL="claude-opus-4-1-20250805"
-    export ANTHROPIC_SMALL_FAST_MODEL="claude-sonnet-4-5-20250929"
+    export ANTHROPIC_MODEL="${OPUS_MODEL:-claude-opus-4-1-20250805}"
+    export ANTHROPIC_SMALL_FAST_MODEL="${OPUS_SMALL_FAST_MODEL:-claude-sonnet-4-5-20250929}"
     echo -e "${GREEN}✅ 已切换到 Claude Opus 4.1 (使用 Claude Pro 订阅)${NC}"
+    if [[ -n "$account_name" ]]; then
+        echo "   $(t 'account'): $account_name"
+    fi
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
 # 切换到Claude Haiku
 switch_to_haiku() {
+    local account_name="$1"
+
     echo -e "${YELLOW}🔄 $(t 'switching_to') Claude Haiku 4.5...${NC}"
+
+    # 如果指定了账号，先切换账号
+    if [[ -n "$account_name" ]]; then
+        echo -e "${BLUE}📝 切换到账号: $account_name${NC}"
+        if ! switch_account "$account_name"; then
+            return 1
+        fi
+    fi
+
     clean_env
     export ANTHROPIC_MODEL="${HAIKU_MODEL:-claude-haiku-4-5}"
     export ANTHROPIC_SMALL_FAST_MODEL="${HAIKU_SMALL_FAST_MODEL:-claude-haiku-4-5}"
     echo -e "${GREEN}✅ 已切换到 Claude Haiku 4.5 (使用 Claude Pro 订阅)${NC}"
+    if [[ -n "$account_name" ]]; then
+        echo "   $(t 'account'): $account_name"
+    fi
     echo "   MODEL: $ANTHROPIC_MODEL"
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
@@ -706,7 +1074,7 @@ switch_to_ppinfra() {
 
 # 显示帮助信息
 show_help() {
-    echo -e "${BLUE}🔧 $(t 'switching_info') v2.1.0${NC}"
+    echo -e "${BLUE}🔧 $(t 'switching_info') v2.2.0${NC}"
     echo ""
     echo -e "${YELLOW}$(t 'usage'):${NC} $(basename "$0") [options]"
     echo ""
@@ -722,6 +1090,16 @@ show_help() {
     echo "  opus, o            - env opus"
     echo "  haiku, h           - env haiku"
     echo ""
+    echo -e "${YELLOW}Claude Pro Account Management:${NC}"
+    echo "  save-account <name>     - Save current Claude Pro account"
+    echo "  switch-account <name>   - Switch to saved account"
+    echo "  list-accounts           - List all saved accounts"
+    echo "  delete-account <name>   - Delete saved account"
+    echo "  current-account         - Show current account info"
+    echo "  claude:account         - Switch account and use Claude (Sonnet)"
+    echo "  opus:account           - Switch account and use Opus model"
+    echo "  haiku:account          - Switch account and use Haiku model"
+    echo ""
     echo -e "${YELLOW}$(t 'tool_options'):${NC}"
     echo "  status, st       - $(t 'show_current_config')"
     echo "  env [model]      - $(t 'output_export_only')"
@@ -732,6 +1110,8 @@ show_help() {
     echo -e "${YELLOW}$(t 'examples'):${NC}"
     echo "  eval \"\$(ccm deepseek)\"                   # Apply in current shell (recommended)"
     echo "  $(basename "$0") status                      # Check current status (masked)"
+    echo "  $(basename "$0") save-account work           # Save current account as 'work'"
+    echo "  $(basename "$0") opus:personal               # Switch to 'personal' account with Opus"
     echo ""
     echo -e "${YELLOW}支持的模型:${NC}"
     echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
@@ -1135,7 +1515,55 @@ main() {
     fi
 
     # 处理参数
-    case "${1:-help}" in
+    local cmd="${1:-help}"
+
+    # 检查是否是 model:account 格式
+    if [[ "$cmd" =~ ^(claude|sonnet|opus|haiku|s|o|h):(.+)$ ]]; then
+        local model_type="${BASH_REMATCH[1]}"
+        local account_name="${BASH_REMATCH[2]}"
+
+        # 先切换账号：将输出重定向到stderr，避免污染stdout（stdout仅用于export语句）
+        switch_account "$account_name" 1>&2 || return 1
+
+        # 然后仅输出对应模型的 export 语句，供调用方 eval
+        case "$model_type" in
+            "claude"|"sonnet"|"s")
+                emit_env_exports claude
+                ;;
+            "opus"|"o")
+                emit_env_exports opus
+                ;;
+            "haiku"|"h")
+                emit_env_exports haiku
+                ;;
+        esac
+        return $?
+    fi
+
+    case "$cmd" in
+        # 账号管理命令
+        "save-account")
+            shift
+            save_account "$1"
+            ;;
+        "switch-account")
+            shift
+            switch_account "$1"
+            ;;
+        "list-accounts")
+            list_accounts
+            ;;
+        "delete-account")
+            shift
+            delete_account "$1"
+            ;;
+        "current-account")
+            get_current_account
+            ;;
+        "debug-keychain")
+            debug_keychain_credentials
+            ;;
+        # 模型切换命令
         "deepseek"|"ds")
             emit_env_exports deepseek
             ;;

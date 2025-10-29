@@ -90,12 +90,12 @@ ccm() {
 
   # All commands use eval to apply environment variables
   case "\$1" in
-    ""|"help"|"-h"|"--help"|"status"|"st"|"config"|"cfg")
+    ""|"help"|"-h"|"--help"|"status"|"st"|"config"|"cfg"|"save-account"|"switch-account"|"list-accounts"|"delete-account"|"current-account"|"debug-keychain")
       # These commands don't need eval, execute directly
       "\$script" "\$@"
       ;;
     *)
-      # All other commands (including pp) use eval to set environment variables
+      # All other commands (including pp, model switching) use eval to set environment variables
       eval "\$("\$script" "\$@")"
       ;;
   esac
@@ -108,15 +108,20 @@ unset -f ccc 2>/dev/null || true
 ccc() {
   if [[ \$# -eq 0 ]]; then
     echo "Usage: ccc <model> [claude-options]"
+    echo "       ccc <account> [claude-options]            # Switch account then launch"
+    echo "       ccc <model>:<account> [claude-options]"
     echo ""
     echo "Examples:"
     echo "  ccc deepseek                              # Launch with DeepSeek"
     echo "  ccc pp deepseek                           # Launch with PPINFRA DeepSeek"
+    echo "  ccc woohelps                              # Switch to 'woohelps' account and launch"
+    echo "  ccc opus:work                             # Switch to 'work' account and launch Opus"
     echo "  ccc glm --dangerously-skip-permissions    # Launch GLM with options"
     echo ""
     echo "Available models:"
-    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, longcat"
+    echo "  Official: deepseek, glm, kimi, qwen, claude, opus, haiku, longcat"
     echo "  PPINFRA:  pp deepseek, pp glm, pp kimi, pp qwen"
+    echo "  Account:  <account> | claude:<account> | opus:<account> | haiku:<account>"
     return 1
   fi
 
@@ -138,13 +143,36 @@ ccc() {
   # Collect additional Claude Code arguments
   claude_args=("\$@")
   
-  # Call ccm to set environment variables
+  # Helper: known model keyword
+  _is_known_model() {
+    case "\$1" in
+      deepseek|ds|glm|glm4|glm4.6|kimi|kimi2|qwen|longcat|lc|minimax|mm|claude|sonnet|s|opus|o|haiku|h)
+        return 0 ;;
+      *)
+        return 1 ;;
+    esac
+  }
+
+  # Configure environment via ccm
   if \$use_pp; then
     echo "🔄 Switching to PPINFRA \$model..."
     ccm pp "\$model" || return 1
   else
-    echo "🔄 Switching to \$model..."
-    ccm "\$model" || return 1
+    if [[ "\$model" == *:* ]]; then
+      # model:account form handled by ccm
+      echo "🔄 Switching to \$model..."
+      ccm "\$model" || return 1
+    elif _is_known_model "\$model"; then
+      echo "🔄 Switching to \$model..."
+      ccm "\$model" || return 1
+    else
+      # Treat as account name
+      local account="\$model"
+      echo "🔄 Switching account to \$account..."
+      ccm switch-account "\$account" || return 1
+      # Set default model (Claude Sonnet)
+      ccm claude || return 1
+    fi
   fi
 
   echo ""
@@ -152,6 +180,12 @@ ccc() {
   echo "   Model: \$ANTHROPIC_MODEL"
   echo "   Base URL: \${ANTHROPIC_BASE_URL:-Default (Anthropic)}"
   echo ""
+
+  # Ensure `claude` CLI exists
+  if ! command -v claude >/dev/null 2>&1; then
+    echo "❌ 'claude' CLI not found. Install: npm install -g @anthropic-ai/claude-code" >&2
+    return 127
+  fi
 
   # Launch Claude Code
   if [[ \${#claude_args[@]} -eq 0 ]]; then
