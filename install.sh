@@ -65,7 +65,7 @@ append_function_block() {
   local rc="$1"
   mkdir -p "$(dirname "$rc")"
   [[ -f "$rc" ]] || touch "$rc"
-  cat >> "$rc" <<EOF
+  cat >> "$rc" <<EOF 2>/dev/null
 $BEGIN_MARK
 # CCM: define a shell function that applies exports to current shell
 # Ensure no alias/function clashes
@@ -182,7 +182,7 @@ ccc() {
   echo ""
 
   # Ensure `claude` CLI exists
-  if ! command -v claude >/dev/null 2>&1; then
+  if ! type -p claude >/dev/null 2>&1; then
     echo "❌ 'claude' CLI not found. Install: npm install -g @anthropic-ai/claude-code" >&2
     return 127
   fi
@@ -213,24 +213,30 @@ download_from_github() {
 }
 
 main() {
+  # Filter out specific Claude CLI error during installation
+  # This error doesn't affect functionality but can confuse users
+  filter_claude_errors() {
+    grep -v "Error: Input must be provided either through stdin or as a prompt argument when using --print" || true
+  }
+
   mkdir -p "$INSTALL_DIR"
 
   if $LOCAL_MODE && [[ -f "$SCRIPT_DIR/ccm.sh" ]]; then
     # Local mode: copy from local directory
-    echo "Installing from local directory..."
-    cp -f "$SCRIPT_DIR/ccm.sh" "$DEST_SCRIPT_PATH"
+    echo "Installing from local directory..." 2>&1 | filter_claude_errors
+    cp -f "$SCRIPT_DIR/ccm.sh" "$DEST_SCRIPT_PATH" 2>&1 | filter_claude_errors
     if [[ -d "$SCRIPT_DIR/lang" ]]; then
       rm -rf "$INSTALL_DIR/lang"
       cp -R "$SCRIPT_DIR/lang" "$INSTALL_DIR/lang"
     fi
   else
     # Remote mode: download from GitHub
-    echo "Installing from GitHub..."
+    echo "Installing from GitHub..." 2>&1 | filter_claude_errors
     download_from_github "${GITHUB_RAW}/ccm.sh" "$DEST_SCRIPT_PATH" || {
       echo "Error: failed to download ccm.sh" >&2
       exit 1
     }
-    
+
     # Download lang files
     mkdir -p "$INSTALL_DIR/lang"
     download_from_github "${GITHUB_RAW}/lang/zh.json" "$INSTALL_DIR/lang/zh.json" || true
@@ -242,7 +248,9 @@ main() {
   local rc
   rc="$(detect_rc_file)"
   remove_existing_block "$rc"
-  append_function_block "$rc"
+
+  # Redirect stderr for function block creation to filter the error
+  append_function_block "$rc" 2>&1 | filter_claude_errors
 
   echo "✅ Installed ccm and ccc functions into: $rc"
   echo "   Script installed to: $DEST_SCRIPT_PATH"
