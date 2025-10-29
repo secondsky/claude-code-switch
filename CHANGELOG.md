@@ -12,22 +12,35 @@
 - 🚀 **Quick account switching**: `ccm opus:account` or `ccm haiku:account` syntax
   - Switch account and select model in one command
   - Works with `ccc` launcher: `ccc opus:work`
-- 🔒 **Secure credential storage**: Account tokens stored in `~/.ccm_accounts` (chmod 600)
-  - Credentials encrypted with base64 encoding
+- 🔒 **Secure credential storage**: Primary storage in macOS Keychain with local backup
+  - Local backup stored in `~/.ccm_accounts` (chmod 600) with base64 encoding
   - Automatic token refresh support
   - Persists across system reboots
+  - Keychain service name configurable via `CCM_KEYCHAIN_SERVICE`
 - 🌐 **Multi-language support**: Added 24 new translation keys for account management
   - English and Chinese translations
   - Seamless integration with existing i18n system
+
+### Added
+- 🔍 **Debug utilities**: `ccm debug-keychain` command for troubleshooting Keychain issues
+- 🛠️ **Enhanced ccc launcher**: Support for account-only and model:account syntax
+  - `ccc <account>` - Switch account and launch with default model
+  - `ccc <model>:<account>` - Switch account and use specific model
 
 ### Changed
 - 📚 Updated documentation:
   - Added comprehensive account management guide in README.md and README_CN.md
   - Updated help text (`ccm help`) with account commands
-  - Added usage examples and setup guides
+  - Added troubleshooting section for common issues
 - 🔧 Enhanced Claude model functions:
   - `switch_to_claude()`, `switch_to_opus()`, `switch_to_haiku()` now support account parameter
   - Better error handling and user feedback
+- 🎯 Improved installer: Updated to handle new account management commands
+
+### Fixed
+- 🔧 Fixed eval pattern issues with colored terminal output
+- 🐛 Resolved account file permission handling
+- ✨ Improved JSON parsing robustness for account storage
 
 ### Use Case
 This update enables users to bypass Claude Pro usage limits by managing multiple Pro accounts, which is more cost-effective than upgrading to Claude Max. Each account has independent usage quotas (5 hours/day, weekly limits).

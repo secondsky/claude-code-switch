@@ -180,7 +180,7 @@ CCM 现在支持管理多个 Claude Pro 订阅账号！在账号之间切换以�
 - **突破使用限制**：每个 Claude Pro 账号有独立的使用限制（每天5小时、每周限制）
 - **节省成本**：多个 Pro 账号比一个 Max 账号更便宜
 - **无缝切换**：无需登出/登入 - CCM 自动处理认证
-- **安全存储**：账号凭证加密并本地存储
+- **安全存储**：账号凭证安全存储在 macOS Keychain 中，带有本地备份
 
 ### 账号管理命令
 
@@ -244,9 +244,15 @@ ccm switch-account 账号1          # 无需浏览器登录！
 **重要说明**：
 - Token 会自动刷新 - 在过期前无需重新登录
 - 切换账号后，需要重启 Claude Code 使更改生效
-- 账号凭证存储在 `~/.ccm_accounts`（权限 600）
+- 账号凭证主要存储在 macOS Keychain 中（最安全）
+- 本地备份存储在 `~/.ccm_accounts` 中，使用 base64 编码和 chmod 600 权限
 - 凭证在系统重启后依然有效
- - Keychain 服务名默认使用 `Claude Code-credentials`。如系统中服务名不同，可通过环境变量 `CCM_KEYCHAIN_SERVICE` 指定。
+- Keychain 服务名默认使用 `Claude Code-credentials`。如系统中服务名不同，可通过环境变量 `CCM_KEYCHAIN_SERVICE` 指定
+
+**安全注意事项**：
+- 始终使用 `chmod 600 ~/.ccm_accounts` 保护本地备份
+- 系统依赖 macOS Keychain 进行安全凭证存储
+- 本地备份使用 base64 编码（非加密）以确保兼容性
 
 ### Keychain 调试
 
@@ -255,6 +261,22 @@ ccm debug-keychain                # 查看当前 Keychain 凭证并尝试匹配�
 # 若显示未找到凭证，但浏览器/IDE 已登录，可指定服务名覆盖：
 CCM_KEYCHAIN_SERVICE="Claude Code" ccm debug-keychain
 ```
+
+### 账号管理故障排除
+
+**问题**："Keychain 中没有凭证"
+- 解决方案：确保您已在浏览器或 IDE 中登录 Claude Code
+- 尝试使用不同的 Keychain 服务名，设置 `CCM_KEYCHAIN_SERVICE` 环境变量
+
+**问题**："账号切换不生效"
+- 解决方案：切换账号后重启 Claude Code
+- 使用 `ccm list-accounts` 检查账号是否存在
+
+**问题**："访问账号文件权限被拒绝"
+- 解决方案：运行 `chmod 600 ~/.ccm_accounts` 修复权限
+
+**问题**："账号文件 JSON 格式错误"
+- 解决方案：删除 `~/.ccm_accounts` 文件，重新保存账号
 
 ## 📖 使用方法
 

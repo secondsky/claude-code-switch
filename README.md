@@ -180,7 +180,7 @@ CCM now supports managing multiple Claude Pro subscription accounts! Switch betw
 - **Bypass Usage Limits**: Each Claude Pro account has its own usage limits (5 hours per day, weekly caps)
 - **Cost-Effective**: Multiple Pro accounts are cheaper than one Max account
 - **Seamless Switching**: No need to log out/in - CCM handles authentication automatically
-- **Secure Storage**: Account credentials encrypted and stored locally
+- **Secure Storage**: Account credentials stored securely in macOS Keychain with local backup
 
 ### Account Management Commands
 
@@ -244,9 +244,15 @@ ccm switch-account account1        # No browser login needed!
 **Important Notes**:
 - Tokens are refreshed automatically - no re-login needed until they expire
 - After switching accounts, restart Claude Code for changes to take effect
-- Account credentials are stored in `~/.ccm_accounts` (chmod 600)
+- Account credentials are primarily stored in macOS Keychain (most secure)
+- Local backup stored in `~/.ccm_accounts` with base64 encoding and chmod 600 permissions
 - Credentials persist across system reboots
- - Keychain service name defaults to `Claude Code-credentials`. Override via `CCM_KEYCHAIN_SERVICE` if your system uses a different name.
+- Keychain service name defaults to `Claude Code-credentials`. Override via `CCM_KEYCHAIN_SERVICE` if your system uses a different name
+
+**Security Considerations**:
+- Always use `chmod 600 ~/.ccm_accounts` to protect your local backup
+- The system relies on macOS Keychain for secure credential storage
+- Local backup uses base64 encoding (not encryption) for compatibility
 
 ### Debugging Keychain
 
@@ -255,6 +261,22 @@ ccm debug-keychain                # Inspect current Keychain credentials and mat
 # If it shows no credentials but you are logged in, set service override:
 CCM_KEYCHAIN_SERVICE="Claude Code" ccm debug-keychain
 ```
+
+### Troubleshooting Account Management
+
+**Problem**: "No credentials found in Keychain"
+- Solution: Make sure you're logged into Claude Code in your browser or IDE
+- Try different keychain service names with `CCM_KEYCHAIN_SERVICE` environment variable
+
+**Problem**: "Account switching doesn't work"
+- Solution: Restart Claude Code after switching accounts
+- Check that the account exists with `ccm list-accounts`
+
+**Problem**: "Permission denied accessing accounts file"
+- Solution: Run `chmod 600 ~/.ccm_accounts` to fix permissions
+
+**Problem**: "JSON format error in accounts file"
+- Solution: Delete `~/.ccm_accounts` and re-save your accounts
 
 ## 📖 Usage
 
