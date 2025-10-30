@@ -1,298 +1,298 @@
-# Claude Code 故障排除 (Troubleshooting)
+# Claude Code Troubleshooting Guide
 
-本指南帮助您解决使用 CCM 切换模型时遇到的常见问题。
+This guide helps you solve common issues when using CCM for model switching.
 
 ---
 
-## 问题 1：404 错误
+## Issue 1: 404 Error
 
-### 症状
+### Symptoms
 ```
-> 你是？
+> Who are you?
   ⎿  API Error: 404 404 page not found
 ```
 
-### 原因分析
+### Cause Analysis
 
-1. **认证冲突**：Claude Code 同时检测到两个认证方式：
-   - `ANTHROPIC_AUTH_TOKEN`（环境变量设置的）
-   - `/login` 管理的 API key（Claude Code 内置的）
+1. **Authentication conflict**: Claude Code detects two authentication methods simultaneously:
+   - `ANTHROPIC_AUTH_TOKEN` (environment variable set)
+   - `/login` managed API key (built-in to Claude Code)
 
-2. **错误的 API 端点**：Base URL 配置不正确或包含重复的路径
+2. **Wrong API endpoint**: Base URL configuration is incorrect or contains duplicate paths
 
-### 解决方案
+### Solutions
 
-#### 方法 1：清除 Claude Code 的登录状态（推荐）
+#### Method 1: Clear Claude Code Login Status (Recommended)
 
-1. **在 Claude Code 中执行 logout**：
+1. **Execute logout in Claude Code**:
    ```
    /logout
    ```
-   或在终端中：
+   Or in terminal:
    ```bash
    claude /logout
    ```
 
-2. **使用 ccc 命令重新启动**：
+2. **Restart using ccc command**:
    ```bash
-   # 重新加载 shell 配置
+   # Reload shell configuration
    source ~/.zshrc
    
-   # 使用 ccc 启动（会自动设置环境变量）
+   # Use ccc to launch (automatically sets environment variables)
    ccc deepseek
    
-   # 或使用 PPINFRA
+   # Or use PPINFRA
    ccc pp glm
    ```
 
-3. **验证**：启动后不应该再看到认证冲突警告。
+3. **Verify**: After startup, you should no longer see authentication conflict warnings.
 
-#### 方法 2：检查环境变量
+#### Method 2: Check Environment Variables
 
-在启动 Claude Code 之前验证配置：
+Verify configuration before starting Claude Code:
 
 ```bash
-# 切换模型
+# Switch model
 ccm deepseek
 
-# 检查配置
+# Check configuration
 ccm status
 
-# 应该看到正确的 BASE_URL 和 AUTH_TOKEN
+# Should see correct BASE_URL and AUTH_TOKEN
 ```
 
-#### 方法 3：检查 claude-code-router 配置
+#### Method 3: Check claude-code-router Configuration
 
-如果使用了 `claude-code-router`，可能会干扰配置：
+If using `claude-code-router`, it may interfere with configuration:
 
 ```bash
-# 查看配置
+# View configuration
 cat ~/.claude-code-router/config.json
 
-# 临时禁用（如果需要）
+# Temporarily disable (if needed)
 mv ~/.claude-code-router ~/.claude-code-router.disabled
 
-# 重新启动
+# Restart
 ccc deepseek
 
-# 测试完成后恢复
+# Restore after testing
 mv ~/.claude-code-router.disabled ~/.claude-code-router
 ```
 
 ---
 
-## 问题 2：代码更新后命令失效或报错
+## Issue 2: Commands Fail or Error After Code Updates
 
-### 症状
+### Symptoms
 
-运行 `ccm` 命令时出现以下错误之一：
+When running `ccm` commands, you see one of these errors:
 
 ```bash
-# 错误示例 1：新增的命令不存在
+# Error example 1: New commands don't exist
 ccm h
 (eval):1: bad pattern: ^[[0
 zsh: parse error near `:1:'
 
-# 错误示例 2：新功能无法使用
+# Error example 2: New features unavailable
 ccm haiku
 zsh: command not found: haiku
 
-# 错误示例 3：旧版本行为
-ccm status  # 显示的是旧配置，没有新添加的模型
+# Error example 3: Old version behavior
+ccm status  # Shows old configuration, no new models
 ```
 
-### 原因分析
+### Cause Analysis
 
-**重要**：`ccm` shell 函数使用的是**已安装的脚本**（位于 `~/.local/share/ccm/ccm.sh`），而不是您工作目录中修改的开发版本。
+**Important**: The `ccm` shell function uses the **installed script** (located at `~/.local/share/ccm/ccm.sh`), not the development version you've modified in your working directory.
 
-当您：
-1. ✏️ 修改了 `ccm.sh` 文件
-2. ❌ 但忘记重新安装
-3. 🔍 运行 `ccm` 命令
+When you:
+1. ✏️ Modify the `ccm.sh` file
+2. ❌ But forget to reinstall
+3. 🔍 Run `ccm` command
 
-结果：您仍在使用**旧版本**的代码，新功能完全不会生效。
+Result: You're still using the **old version** of the code, new features won't take effect at all.
 
-### 解决方案
+### Solutions
 
-#### ✅ 标准开发流程（每次修改代码后必做）
+#### ✅ Standard Development Process (Required After Every Code Modification)
 
 ```bash
-# 1. 修改代码后，重新安装
+# 1. After modifying code, reinstall
 ./install.sh
 
-# 2. 重新加载 shell 配置
-source ~/.zshrc  # 或 source ~/.bashrc
+# 2. Reload shell configuration
+source ~/.zshrc  # or source ~/.bashrc
 
-# 3. 验证更新
-ccm status      # 检查版本是否更新
-ccm help        # 确认新命令出现在帮助中
+# 3. Verify update
+ccm status      # Check if version is updated
+ccm help        # Confirm new commands appear in help
 ```
 
-#### 🔍 验证是否需要重新安装
+#### 🔍 Verify If Reinstallation Is Needed
 
 ```bash
-# 检查已安装版本的位置
+# Check installed version location
 type ccm
-# 输出：ccm is a shell function from /Users/xxx/.zshrc
+# Output: ccm is a shell function from /Users/xxx/.zshrc
 
-# 查看已安装脚本的修改时间
+# View installed script modification time
 ls -lh ~/.local/share/ccm/ccm.sh
 
-# 对比工作目录版本
+# Compare with working directory version
 ls -lh ccm.sh
 
-# 如果时间不匹配，说明需要重新安装
+# If times don't match, reinstallation is needed
 ```
 
-#### 🎯 开发者工作流程速查
+#### 🎯 Developer Workflow Quick Reference
 
 ```bash
-# 开发循环
-1. vim ccm.sh              # 编辑代码
-2. ./install.sh            # 安装更新
-3. source ~/.zshrc         # 重载配置  
-4. ccm <test-command>      # 测试功能
-5. 如有问题，回到步骤 1
+# Development cycle
+1. vim ccm.sh              # Edit code
+2. ./install.sh            # Install updates
+3. source ~/.zshrc         # Reload configuration  
+4. ccm <test-command>      # Test functionality
+5. If issues, return to step 1
 ```
 
-### 特别提醒
+### Special Reminder
 
-⚠️ **常见错误模式**：
-- ❌ 修改代码 → 直接运行 `ccm` → 疑惑为什么没生效
-- ✅ 修改代码 → `./install.sh` → `source ~/.zshrc` → 运行 `ccm`
+⚠️ **Common Error Pattern**:
+- ❌ Modify code → run `ccm` directly → wonder why it doesn't work
+- ✅ Modify code → `./install.sh` → `source ~/.zshrc` → run `ccm`
 
-💡 **记忆技巧**：把 `./install.sh && source ~/.zshrc` 作为一个固定操作，每次改代码后都执行。
+💡 **Memory Tip**: Consider `./install.sh && source ~/.zshrc` as a fixed operation, execute after every code change.
 
 ---
 
-## 问题 3：环境变量未生效
+## Issue 3: Environment Variables Not Taking Effect
 
-### 症状
+### Symptoms
 
-Claude Code 启动后仍然使用旧的 API 端点。
+After starting Claude Code, it still uses the old API endpoint.
 
-### 原因
+### Cause
 
-Claude Code 继承的是**启动时**的环境变量，不是当前 shell 的环境变量。
+Claude Code inherits environment variables from **startup time**, not the current shell environment.
 
-### 解决方案
+### Solutions
 
-**使用 `ccc` 命令（推荐）**：
+**Use `ccc` command (Recommended)**:
 
 ```bash
-# 一步到位：切换模型并启动 Claude Code
+# One-step: switch model and start Claude Code
 ccc deepseek
 
-# 使用 PPINFRA
+# Use PPINFRA
 ccc pp glm
 ```
 
-**或者两步走**：
+**Or two-step approach**:
 
 ```bash
-# 1. 先切换环境
+# 1. Switch environment first
 ccm deepseek
 
-# 2. 再启动 Claude Code
+# 2. Then start Claude Code
 claude
 ```
 
-⚠️ **注意**：不要先启动 Claude Code，然后再切换环境变量，这样不会生效。
+⚠️ **Note**: Don't start Claude Code first, then switch environment variables - this won't work.
 
 ---
 
-## 问题 4：PPINFRA API Key 未配置
+## Issue 4: PPINFRA API Key Not Configured
 
-### 症状
+### Symptoms
 ```
 ❌ PPINFRA_API_KEY not configured
 ```
 
-### 解决方案
+### Solutions
 
-编辑配置文件：
+Edit configuration file:
 
 ```bash
-# 打开配置文件
+# Open configuration file
 ccm config
 
-# 或直接编辑
+# Or edit directly
 vim ~/.ccm_config
 ```
 
-添加您的 PPINFRA API Key：
+Add your PPINFRA API Key:
 ```bash
 PPINFRA_API_KEY=your-actual-api-key-here
 ```
 
-保存后重新切换：
+After saving, switch again:
 ```bash
 ccm pp deepseek
-ccm status  # 验证配置
+ccm status  # Verify configuration
 ```
 
 ---
 
-## 常见警告及解决方法
+## Common Warnings and Solutions
 
-### ⚠️ Auth conflict 警告
+### ⚠️ Auth Conflict Warning
 
 ```
 ⚠ Auth conflict: Both a token (ANTHROPIC_AUTH_TOKEN) and an API key (/login managed key) are set.
 ```
 
-**解决**：
+**Solution**:
 ```bash
-# 在 Claude Code 中执行
+# Execute in Claude Code
 /logout
 
-# 或在终端执行
+# Or in terminal
 claude /logout
 
-# 然后重新启动
+# Then restart
 ccc deepseek
 ```
 
-### ❌ Model not found 错误
+### ❌ Model Not Found Error
 
-**可能原因**：
-- 模型名称拼写错误
-- PPINFRA 服务不支持该模型
-- API Key 无效
+**Possible causes**:
+- Incorrect model name spelling
+- PPINFRA service doesn't support that model
+- Invalid API Key
 
-**解决**：
+**Solution**:
 ```bash
-# 查看支持的模型
+# View supported models
 ccm help
 
-# 验证配置
+# Verify configuration
 ccm status
 
-# 确保 API Key 正确
+# Ensure API Key is correct
 ccm config
 ```
 
 ---
 
-## Debug 检查清单
+## Debug Checklist
 
-在报告问题前，请逐一检查：
+Before reporting issues, please check each item:
 
-- [ ] 已安装最新版本：`./install.sh`
-- [ ] 已重新加载 shell：`source ~/.zshrc`
-- [ ] 已执行 `claude /logout` 清除认证冲突
-- [ ] 配置文件正确：`ccm config` 检查 API keys
-- [ ] 环境变量正确：`ccm status` 验证配置
-- [ ] 使用 `ccc` 命令启动（不是手动 `ccm` + `claude`）
-- [ ] 没有 `claude-code-router` 干扰
+- [ ] Latest version installed: `./install.sh`
+- [ ] Shell reloaded: `source ~/.zshrc`
+- [ ] Executed `claude /logout` to clear authentication conflicts
+- [ ] Configuration file correct: `ccm config` check API keys
+- [ ] Environment variables correct: `ccm status` verify configuration
+- [ ] Used `ccc` command to start (not manually `ccm` + `claude`)
+- [ ] No `claude-code-router` interference
 
 ---
 
-## 成功启动的标志
+## Signs of Successful Launch
 
-### 使用 ccc 启动时
+### When Using ccc to Start
 
-正确的启动流程应该显示：
+The correct startup flow should display:
 
 ```bash
 $ ccc deepseek
@@ -312,54 +312,54 @@ $ ccc deepseek
 ╰─────────────────────────────────────────────────────╯
 ```
 
-**关键点**：
-- ✅ 没有认证冲突警告
-- ✅ Base URL 显示正确
-- ✅ 可以直接开始对话
+**Key points**:
+- ✅ No authentication conflict warnings
+- ✅ Base URL displays correctly
+- ✅ Can start conversation directly
 
 ---
 
-## 快速测试命令
+## Quick Test Commands
 
 ```bash
-# 测试官方 API
+# Test official API
 ccc deepseek
-# 输入: 你好
-# 应该得到正常回复
+# Input: Hello
+# Should get normal response
 
-# 测试 PPINFRA
+# Test PPINFRA
 ccc pp glm
-# 输入: 你好  
-# 应该得到正常回复
+# Input: Hello  
+# Should get normal response
 ```
 
 ---
 
-## 需要帮助？
+## Need Help?
 
-如果以上方法都无法解决，请提供以下信息：
+If none of the above methods solve the problem, please provide the following information:
 
-1. **系统信息**：
+1. **System Information**:
    ```bash
    uname -a
    echo $SHELL
    ```
 
-2. **CCM 版本**：
+2. **CCM Version**:
    ```bash
-   head -5 ccm.sh  # 查看版本注释
+   head -5 ccm.sh  # View version comments
    ```
 
-3. **配置状态**：
+3. **Configuration Status**:
    ```bash
    ccm status
    ```
 
-4. **启动命令和完整输出**：
+4. **Startup Command and Full Output**:
    ```bash
    ccc deepseek 2>&1 | tee debug.log
    ```
 
-5. **错误消息**：完整的错误信息截图或文本
+5. **Error Messages**: Complete error message screenshot or text
 
-将以上信息提交到项目 Issues 页面。
+Submit the above information to the project Issues page.

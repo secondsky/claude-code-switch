@@ -6,7 +6,7 @@
 [![Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/foreveryh/claude-code-switch)
 
-[中文文档](README_CN.md) | [English](README.md)
+[Documentation](README.md)
 
 ## 🎯 Quick Start (Zero Configuration)
 

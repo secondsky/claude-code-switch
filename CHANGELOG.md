@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.3.0] - 2025-10-30
+
+### Changed
+- 🌐 **Language support**: Removed Chinese language support and translated all documentation to English
+  - Removed README_CN.md (Chinese documentation)
+  - Translated lang/zh.json to English
+  - Updated PPINFRA_USAGE.md to English
+  - Translated TROUBLESHOOTING.md to English
+  - Updated all Chinese comments in shell scripts to English
+- 🔧 **GLM endpoint**: Updated GLM model to use global endpoint instead of China-specific endpoint
+  - Changed from `https://api.z.ai/api/anthropic` to global configuration
+  - Improved international accessibility for GLM models
+
 ## [2.2.0] - 2025-10-27
 
 ### Added - Claude Pro Account Management 🔐
@@ -73,8 +86,8 @@ This update enables users to bypass Claude Pro usage limits by managing multiple
 - Obsolete test scripts (moved to backup)
 
 ### Fixed
-- 修复 `ccm pp` 命令环境变量不生效的问题
-- 修复 GLM 模型版本配置（从 4.5 升级到 4.6）
+- Fixed `ccm pp` command environment variable not taking effect
+- Fixed GLM model version configuration (upgraded from 4.5 to 4.6)
 - Fixed PPINFRA API endpoint (removed duplicate `/v1`)
 - Fixed authentication conflicts (use only `ANTHROPIC_AUTH_TOKEN`)
 
