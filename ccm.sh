@@ -15,6 +15,20 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# 颜色控制（用于账号管理命令的输出）
+NO_COLOR=false
+
+# 根据NO_COLOR设置颜色（账号管理函数使用）
+set_no_color() {
+    if [[ "$NO_COLOR" == "true" ]]; then
+        RED=''
+        GREEN=''
+        YELLOW=''
+        BLUE=''
+        NC=''
+    fi
+}
+
 # 配置文件路径
 CONFIG_FILE="$HOME/.ccm_config"
 ACCOUNTS_FILE="$HOME/.ccm_accounts"
@@ -410,6 +424,10 @@ init_accounts_file() {
 
 # 保存当前账号
 save_account() {
+    # 检查是否需要禁用颜色（用于 eval）
+    if [[ "$NO_COLOR" == "true" ]]; then
+        set_no_color
+    fi
     local account_name="$1"
 
     if [[ -z "$account_name" ]]; then
@@ -481,6 +499,10 @@ EOF
 
 # 切换到指定账号
 switch_account() {
+    # 检查是否需要禁用颜色（用于 eval）
+    if [[ "$NO_COLOR" == "true" ]]; then
+        set_no_color
+    fi
     local account_name="$1"
 
     if [[ -z "$account_name" ]]; then
