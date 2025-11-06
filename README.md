@@ -44,7 +44,8 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 
 | Model | Official Support | Fallback Support(PPINFRA) | Features |
 |-------|------------------|---------------------------|----------|
-| 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | Long text processing |
+| 🌙 **KIMI for Coding** | ✅ kimi-for-coding | ✅ kimi-k2-turbo-preview | Kimi official coding version |
+| 🌕 **KIMI CN** | ✅ kimi-k2-thinking | ✅ kimi-k2-thinking | Kimi China domestic version |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | Cost-effective reasoning |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | Code & reasoning |
@@ -52,8 +53,8 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
-|| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
-|| 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
+| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
+| 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
 
 > 🎁 **GLM-4.6 Official Registration**
 >
@@ -149,7 +150,7 @@ CCM uses a hierarchical configuration system:
 
 # Official API keys
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-KIMI_API_KEY=your-moonshot-api-key
+KIMI_API_KEY=your-kimi-api-key  # Moonshot AI
 LONGCAT_API_KEY=your-longcat-api-key
 MINIMAX_API_KEY=your-minimax-api-key
 GLM_API_KEY=your-glm-api-key
@@ -157,7 +158,8 @@ QWEN_API_KEY=your-qwen-api-key  # Alibaba Cloud DashScope
 
 # Optional: override model IDs (if omitted, defaults are used)
 DEEPSEEK_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-turbo-preview
+KIMI_MODEL=kimi-for-coding  # For KIMI for Coding
+KIMI_CN_MODEL=kimi-k2-thinking  # For KIMI CN (domestic version)
 LONGCAT_MODEL=LongCat-Flash-Thinking
 MINIMAX_MODEL=MiniMax-M2
 QWEN_MODEL=qwen3-max
@@ -301,7 +303,8 @@ ccc kimi --dangerously-skip-permissions # Pass options to Claude Code
 
 ```bash
 # Switch to different models
-ccm kimi          # Switch to KIMI2
+ccm kimi          # Switch to KIMI for Coding (official coding version)
+ccm kimi-cn       # Switch to KIMI CN (China domestic version)
 ccm deepseek      # Switch to Deepseek
 ccm minimax       # Switch to MiniMax M2
 ccm qwen          # Switch to Qwen

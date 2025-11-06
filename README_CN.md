@@ -44,7 +44,8 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 
 | 模型 | 官方支持 | 备用支持(PPINFRA) | 特色 |
 |------|---------|------------------|------|
-| 🌙 **KIMI2** | ✅ kimi-k2-turbo-preview | ✅ kimi-k2-turbo-preview | 长文本处理 |
+| 🌙 **KIMI for Coding** | ✅ kimi-for-coding | ✅ kimi-k2-turbo-preview | Kimi官方编程专用版本 |
+| 🌕 **KIMI CN** | ✅ kimi-k2-thinking | ✅ kimi-k2-thinking | Kimi国内版本 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | 高性价比推理 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | 代码和推理 |
@@ -52,8 +53,8 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 | 🐪 **Qwen** | ✅ qwen3-max（阿里云） | ✅ qwen3-next-80b-a3b-thinking | 阿里云官方 |
 | 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | 智谱清言 |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ 仅官方 | 平衡性能 |
-|| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
-|| 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ 仅官方 | 快速高效 |
+| 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ 仅官方 | 最强推理 |
+| 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ 仅官方 | 快速高效 |
 
 > 🎁 **GLM-4.6 官方注册**
 >
@@ -149,7 +150,7 @@ CCM使用分层配置系统：
 
 # 官方API密钥
 DEEPSEEK_API_KEY=sk-your-deepseek-api-key
-KIMI_API_KEY=your-moonshot-api-key
+KIMI_API_KEY=your-kimi-api-key  # Moonshot AI
 LONGCAT_API_KEY=your-longcat-api-key
 MINIMAX_API_KEY=your-minimax-api-key
 GLM_API_KEY=your-glm-api-key
@@ -157,7 +158,8 @@ QWEN_API_KEY=your-qwen-api-key  # 阿里云 DashScope
 
 # 可选：覆盖模型ID（省略时使用默认值）
 DEEPSEEK_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-turbo-preview
+KIMI_MODEL=kimi-for-coding  # 用于 KIMI for Coding
+KIMI_CN_MODEL=kimi-k2-thinking  # 用于 KIMI CN（国内版本）
 LONGCAT_MODEL=LongCat-Flash-Thinking
 MINIMAX_MODEL=MiniMax-M2
 QWEN_MODEL=qwen3-max
@@ -301,7 +303,8 @@ ccc kimi --dangerously-skip-permissions # 传递选项给Claude Code
 
 ```bash
 # 切换到不同模型
-ccm kimi          # 切换到KIMI2
+ccm kimi          # 切换到KIMI for Coding（官方编程版本）
+ccm kimi-cn       # 切换到KIMI CN（国内版本）
 ccm deepseek      # 切换到Deepseek
 ccm minimax       # 切换到MiniMax M2
 ccm qwen          # 切换到Qwen
