@@ -108,8 +108,8 @@ DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 # GLM4.6 (智谱清言)
 GLM_API_KEY=your-glm-api-key
 
-# KIMI2 (月之暗面)
-KIMI_API_KEY=your-moonshot-api-key
+# KIMI for Coding (月之暗面)
+KIMI_API_KEY=your-kimi-api-key
 
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
@@ -129,8 +129,10 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 # —— 可选：模型ID覆盖（不设置则使用下方默认）——
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-turbo-preview
-KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
+KIMI_MODEL=kimi-for-coding
+KIMI_SMALL_FAST_MODEL=kimi-for-coding
+KIMI_CN_MODEL=kimi-k2-thinking
+KIMI_CN_SMALL_FAST_MODEL=kimi-k2-thinking
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
 GLM_MODEL=glm-4.6
@@ -223,8 +225,8 @@ DEEPSEEK_API_KEY=sk-your-deepseek-api-key
 # GLM4.6 (智谱清言)
 GLM_API_KEY=your-glm-api-key
 
-# KIMI2 (月之暗面)
-KIMI_API_KEY=your-moonshot-api-key
+# KIMI for Coding (月之暗面)
+KIMI_API_KEY=your-kimi-api-key
 
 # LongCat（美团）
 LONGCAT_API_KEY=your-longcat-api-key
@@ -244,8 +246,10 @@ PPINFRA_API_KEY=your-ppinfra-api-key
 # —— 可选：模型ID覆盖（不设置则使用下方默认）——
 DEEPSEEK_MODEL=deepseek-chat
 DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat
-KIMI_MODEL=kimi-k2-turbo-preview
-KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview
+KIMI_MODEL=kimi-for-coding
+KIMI_SMALL_FAST_MODEL=kimi-for-coding
+KIMI_CN_MODEL=kimi-k2-thinking
+KIMI_CN_SMALL_FAST_MODEL=kimi-k2-thinking
 QWEN_MODEL=qwen3-max
 QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct
 GLM_MODEL=glm-4.6
@@ -812,19 +816,19 @@ switch_to_glm() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
-# 切换到KIMI2
+# 切换到KIMI for Coding
 switch_to_kimi() {
-    echo -e "${YELLOW}🔄 $(t 'switching_to') KIMI2 $(t 'model')...${NC}"
+    echo -e "${YELLOW}🔄 $(t 'switching_to') KIMI for Coding $(t 'model')...${NC}"
     clean_env
     if is_effectively_set "$KIMI_API_KEY"; then
-        # 官方 Moonshot KIMI 的 Anthropic 兼容端点
-        export ANTHROPIC_BASE_URL="https://api.moonshot.cn/anthropic"
-        export ANTHROPIC_API_URL="https://api.moonshot.cn/anthropic"
+        # 官方 Kimi 编程专用端点
+        export ANTHROPIC_BASE_URL="https://api.kimi.com/coding/"
+        export ANTHROPIC_API_URL="https://api.kimi.com/coding/"
         export ANTHROPIC_AUTH_TOKEN="$KIMI_API_KEY"
         export ANTHROPIC_API_KEY="$KIMI_API_KEY"
-        export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
-        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
-        echo -e "${GREEN}✅ $(t 'switched_to') KIMI2（$(t 'official')）${NC}"
+        export ANTHROPIC_MODEL="kimi-for-coding"
+        export ANTHROPIC_SMALL_FAST_MODEL="kimi-for-coding"
+        echo -e "${GREEN}✅ $(t 'switched_to') KIMI（$(t 'official')）${NC}"
     elif is_effectively_set "$PPINFRA_API_KEY"; then
         # 备用：PPINFRA Anthropic 兼容
         export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
@@ -844,6 +848,44 @@ switch_to_kimi() {
         export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
         export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
         echo -e "${GREEN}✅ $(t 'switched_to') KIMI2（$(t 'default_experience_key')）${NC}"
+    fi
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
+}
+
+# 切换到KIMI CN (国内版本)
+switch_to_kimi_cn() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') KIMI CN $(t 'model')...${NC}"
+    clean_env
+    if is_effectively_set "$KIMI_API_KEY"; then
+        # 国内 Kimi 端点
+        export ANTHROPIC_BASE_URL="https://api.moonshot.cn/anthropic"
+        export ANTHROPIC_API_URL="https://api.moonshot.cn/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$KIMI_API_KEY"
+        export ANTHROPIC_API_KEY="$KIMI_API_KEY"
+        export ANTHROPIC_MODEL="kimi-k2-thinking"
+        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-thinking"
+        echo -e "${GREEN}✅ $(t 'switched_to') KIMI CN（$(t 'official')）${NC}"
+    elif is_effectively_set "$PPINFRA_API_KEY"; then
+        # 备用：PPINFRA Anthropic 兼容
+        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
+        export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
+        export ANTHROPIC_MODEL="kimi-k2-thinking"
+        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-thinking"
+        echo -e "${GREEN}✅ $(t 'switched_to') KIMI CN（$(t 'ppinfra_backup')）${NC}"
+    else
+        # 默认体验密钥
+        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
+        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
+        export ANTHROPIC_API_KEY="$hidden_key"
+        export ANTHROPIC_MODEL="kimi-k2-thinking"
+        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-thinking"
+        echo -e "${GREEN}✅ $(t 'switched_to') KIMI CN（$(t 'default_experience_key')）${NC}"
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -1032,6 +1074,18 @@ switch_to_ppinfra() {
             echo "export ANTHROPIC_MODEL='kimi-k2-turbo-preview'"
             echo "export ANTHROPIC_SMALL_FAST_MODEL='kimi-k2-turbo-preview'"
             ;;
+        "kimi-cn")
+            if [[ "$no_color" == "true" ]]; then
+                echo "✅ $(t 'switched_to') KIMI CN（PPINFRA）" >&2
+            else
+                echo -e "${GREEN}✅ $(t 'switched_to') KIMI CN（PPINFRA）${NC}" >&2
+            fi
+            echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+            echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+            echo "export ANTHROPIC_AUTH_TOKEN='$ppinfra_key'"
+            echo "export ANTHROPIC_MODEL='kimi-k2-thinking'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='kimi-k2-thinking'"
+            ;;
         "qwen")
             if [[ "$no_color" == "true" ]]; then
                 echo "✅ $(t 'switched_to') Qwen（PPINFRA）" >&2
@@ -1080,7 +1134,8 @@ show_help() {
     echo ""
     echo -e "${YELLOW}$(t 'model_options'):${NC}"
     echo "  deepseek, ds       - env deepseek"
-    echo "  kimi, kimi2        - env kimi"
+    echo "  kimi, kimi2        - env kimi for coding"
+    echo "  kimi-cn            - env kimi cn (国内版本)"
     echo "  kat                - env kat"
     echo "  longcat, lc        - env longcat"
     echo "  minimax, mm        - env minimax"
@@ -1114,7 +1169,8 @@ show_help() {
     echo "  $(basename "$0") opus:personal               # Switch to 'personal' account with Opus"
     echo ""
     echo -e "${YELLOW}支持的模型:${NC}"
-    echo "  🌙 KIMI2               - 官方：kimi-k2-turbo-preview"
+    echo "  🌙 KIMI for Coding     - 官方：kimi-for-coding (api.kimi.com/coding)"
+    echo "  🌕 KIMI CN              - 官方：kimi-k2-thinking (api.moonshot.cn/anthropic)"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
     echo "  🌊 StreamLake (KAT)    - 官方：KAT-Coder"
     echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
@@ -1131,8 +1187,10 @@ ensure_model_override_defaults() {
     local -a pairs=(
         "DEEPSEEK_MODEL=deepseek-chat"
         "DEEPSEEK_SMALL_FAST_MODEL=deepseek-chat"
-        "KIMI_MODEL=kimi-k2-turbo-preview"
-        "KIMI_SMALL_FAST_MODEL=kimi-k2-turbo-preview"
+        "KIMI_MODEL=kimi-for-coding"
+        "KIMI_SMALL_FAST_MODEL=kimi-for-coding"
+        "KIMI_CN_MODEL=kimi-k2-thinking"
+        "KIMI_CN_SMALL_FAST_MODEL=kimi-k2-thinking"
         "KAT_MODEL=KAT-Coder"
         "KAT_SMALL_FAST_MODEL=KAT-Coder"
         "KAT_ENDPOINT_ID=ep-default"
@@ -1265,12 +1323,12 @@ emit_env_exports() {
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.moonshot.cn/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.moonshot.cn/anthropic'"
+                echo "export ANTHROPIC_BASE_URL='https://api.kimi.com/coding/'"
+                echo "export ANTHROPIC_API_URL='https://api.kimi.com/coding/'"
                 echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${KIMI_API_KEY}\""
-                local kimi_model="${KIMI_MODEL:-kimi-k2-turbo-preview}"
-                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-turbo-preview}"
+                local kimi_model="${KIMI_MODEL:-kimi-for-coding}"
+                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-for-coding}"
                 echo "export ANTHROPIC_MODEL='${kimi_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             elif is_effectively_set "$PPINFRA_API_KEY"; then
@@ -1298,6 +1356,46 @@ emit_env_exports() {
                 local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-turbo-preview}"
                 echo "export ANTHROPIC_MODEL='${kimi_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
+            fi
+            ;;
+        "kimi-cn")
+            if is_effectively_set "$KIMI_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.moonshot.cn/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.moonshot.cn/anthropic'"
+                echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${KIMI_API_KEY}\""
+                local kimi_cn_model="${KIMI_CN_MODEL:-kimi-k2-thinking}"
+                local kimi_cn_small="${KIMI_CN_SMALL_FAST_MODEL:-kimi-k2-thinking}"
+                echo "export ANTHROPIC_MODEL='${kimi_cn_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_cn_small}'"
+            elif is_effectively_set "$PPINFRA_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+                echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
+                local kimi_cn_model="${KIMI_CN_MODEL:-kimi-k2-thinking}"
+                local kimi_cn_small="${KIMI_CN_SMALL_FAST_MODEL:-kimi-k2-thinking}"
+                echo "export ANTHROPIC_MODEL='${kimi_cn_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_cn_small}'"
+            else
+                # 默认体验密钥
+                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='600000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
+                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
+                local kimi_cn_model="${KIMI_CN_MODEL:-kimi-k2-thinking}"
+                local kimi_cn_small="${KIMI_CN_SMALL_FAST_MODEL:-kimi-k2-thinking}"
+                echo "export ANTHROPIC_MODEL='${kimi_cn_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_cn_small}'"
             fi
             ;;
         "qwen")
@@ -1569,6 +1667,9 @@ main() {
             ;;
         "kimi"|"kimi2")
             emit_env_exports kimi
+            ;;
+        "kimi-cn")
+            emit_env_exports kimi-cn
             ;;
         "qwen")
             emit_env_exports qwen
