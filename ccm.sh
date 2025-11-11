@@ -712,15 +712,8 @@ switch_to_deepseek() {
         export ANTHROPIC_SMALL_FAST_MODEL="deepseek/deepseek-v3.2-exp"
         echo -e "${GREEN}✅ $(t 'switched_to') Deepseek（$(t 'ppinfra_backup')）${NC}"
     else
-        # 隐藏彩蛋：默认 DeepSeek 3.1 体验密钥（经过混淆处理）
-        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
-        export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="deepseek/deepseek-v3.2-exp"
-        export ANTHROPIC_SMALL_FAST_MODEL="deepseek/deepseek-v3.2-exp"
-        echo -e "${GREEN}✅ $(t 'switched_to') Deepseek（$(t 'default_experience_key')）${NC}"
+        echo -e "${RED}❌ Please configure DEEPSEEK_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -823,15 +816,8 @@ switch_to_glm() {
         export ANTHROPIC_SMALL_FAST_MODEL="zai-org/glm-4.6"
         echo -e "${GREEN}✅ 已切换到 GLM4.6（PPINFRA 备用）${NC}"
     else
-        # 默认体验密钥
-        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
-        export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="zai-org/glm-4.6"
-        export ANTHROPIC_SMALL_FAST_MODEL="zai-org/glm-4.6"
-        echo -e "${GREEN}✅ 已切换到 GLM4.6（$(t 'default_experience_key')）${NC}"
+        echo -e "${RED}❌ Please configure GLM_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -857,19 +843,12 @@ switch_to_kimi() {
         export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
-        export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
-        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
+        export ANTHROPIC_MODEL="moonshotai/kimi-k2-thinking"
+        export ANTHROPIC_SMALL_FAST_MODEL="moonshotai/kimi-k2-thinking"
         echo -e "${GREEN}✅ $(t 'switched_to') KIMI2（$(t 'ppinfra_backup')）${NC}"
     else
-        # 默认体验密钥
-        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
-        export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="kimi-k2-turbo-preview"
-        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-turbo-preview"
-        echo -e "${GREEN}✅ $(t 'switched_to') KIMI2（$(t 'default_experience_key')）${NC}"
+        echo -e "${RED}❌ Please configure KIMI_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -895,19 +874,12 @@ switch_to_kimi_cn() {
         export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$PPINFRA_API_KEY"
         export ANTHROPIC_API_KEY="$PPINFRA_API_KEY"
-        export ANTHROPIC_MODEL="kimi-k2-thinking"
-        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-thinking"
+        export ANTHROPIC_MODEL="moonshotai/kimi-k2-thinking"
+        export ANTHROPIC_SMALL_FAST_MODEL="moonshotai/kimi-k2-thinking"
         echo -e "${GREEN}✅ $(t 'switched_to') KIMI CN（$(t 'ppinfra_backup')）${NC}"
     else
-        # 默认体验密钥
-        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
-        export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="kimi-k2-thinking"
-        export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-thinking"
-        echo -e "${GREEN}✅ $(t 'switched_to') KIMI CN（$(t 'default_experience_key')）${NC}"
+        echo -e "${RED}❌ Please configure KIMI_CN_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -937,15 +909,8 @@ switch_to_minimax() {
         export ANTHROPIC_SMALL_FAST_MODEL="minimax/minimax-m2"
         echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'ppinfra_backup')）${NC}"
     else
-        # 默认体验密钥
-        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
-        export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="minimax/minimax-m2"
-        export ANTHROPIC_SMALL_FAST_MODEL="minimax/minimax-m2"
-        echo -e "${GREEN}✅ $(t 'switched_to') MiniMax M2（$(t 'default_experience_key')）${NC}"
+        echo -e "${RED}❌ Please configure MINIMAX_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -977,15 +942,8 @@ switch_to_qwen() {
         export ANTHROPIC_SMALL_FAST_MODEL="qwen3-next-80b-a3b-thinking"
         echo -e "${GREEN}✅ $(t 'switched_to') Qwen（$(t 'ppinfra_backup')）${NC}"
     else
-        # 默认体验密钥
-        local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-        export ANTHROPIC_BASE_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_API_URL="https://api.ppinfra.com/anthropic"
-        export ANTHROPIC_AUTH_TOKEN="$hidden_key"
-        export ANTHROPIC_API_KEY="$hidden_key"
-        export ANTHROPIC_MODEL="qwen3-next-80b-a3b-thinking"
-        export ANTHROPIC_SMALL_FAST_MODEL="qwen3-next-80b-a3b-thinking"
-        echo -e "${GREEN}✅ $(t 'switched_to') Qwen（$(t 'default_experience_key')）${NC}"
+        echo -e "${RED}❌ Please configure QWEN_API_KEY or PPINFRA_API_KEY${NC}"
+        return 1
     fi
     echo "   BASE_URL: $ANTHROPIC_BASE_URL"
     echo "   MODEL: $ANTHROPIC_MODEL"
@@ -1034,10 +992,12 @@ switch_to_ppinfra() {
     # 重新加载配置以确保使用最新的值
     load_config || return 1
 
-    # 如果PPINFRA_API_KEY未配置，使用默认体验密钥
+    # 检查PPINFRA_API_KEY是否配置
     local ppinfra_key="$PPINFRA_API_KEY"
     if ! is_effectively_set "$ppinfra_key"; then
-        ppinfra_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
+        echo -e "${RED}❌ PPINFRA_API_KEY not configured${NC}" >&2
+        echo -e "${YELLOW}Please configure PPINFRA_API_KEY in ~/.ccm_config or as environment variable${NC}" >&2
+        return 1
     fi
 
     # 如果没有指定目标模型，显示选择菜单
@@ -1093,8 +1053,8 @@ switch_to_ppinfra() {
             echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
             echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
             echo "export ANTHROPIC_AUTH_TOKEN='$ppinfra_key'"
-            echo "export ANTHROPIC_MODEL='kimi-k2-turbo-preview'"
-            echo "export ANTHROPIC_SMALL_FAST_MODEL='kimi-k2-turbo-preview'"
+            echo "export ANTHROPIC_MODEL='moonshotai/kimi-k2-thinking'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='moonshotai/kimi-k2-thinking'"
             ;;
         "kimi-cn")
             if [[ "$no_color" == "true" ]]; then
@@ -1105,8 +1065,8 @@ switch_to_ppinfra() {
             echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
             echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
             echo "export ANTHROPIC_AUTH_TOKEN='$ppinfra_key'"
-            echo "export ANTHROPIC_MODEL='kimi-k2-thinking'"
-            echo "export ANTHROPIC_SMALL_FAST_MODEL='kimi-k2-thinking'"
+            echo "export ANTHROPIC_MODEL='moonshotai/kimi-k2-thinking'"
+            echo "export ANTHROPIC_SMALL_FAST_MODEL='moonshotai/kimi-k2-thinking'"
             ;;
         "qwen")
             if [[ "$no_color" == "true" ]]; then
@@ -1326,18 +1286,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${ds_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
             else
-                # 隐藏彩蛋：默认 DeepSeek 3.1 体验密钥，为了方便各位体验，但这个有RPM的限制，需要的话可以在 README.md 里找到 PPINFA 的注册入口
-                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local ds_model="${DEEPSEEK_MODEL:-deepseek/deepseek-v3.2-exp}"
-                local ds_small="${DEEPSEEK_SMALL_FAST_MODEL:-deepseek/deepseek-v3.2-exp}"
-                echo "export ANTHROPIC_MODEL='${ds_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${ds_small}'"
+                echo -e "${RED}❌ Please configure DEEPSEEK_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
             fi
             ;;
         "kimi"|"kimi2")
@@ -1361,23 +1311,13 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
                 echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                local kimi_model="${KIMI_MODEL:-kimi-k2-turbo-preview}"
-                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-turbo-preview}"
+                local kimi_model="${KIMI_MODEL:-moonshotai/kimi-k2-thinking}"
+                local kimi_small="${KIMI_SMALL_FAST_MODEL:-moonshotai/kimi-k2-thinking}"
                 echo "export ANTHROPIC_MODEL='${kimi_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
             else
-                # 默认体验密钥
-                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local kimi_model="${KIMI_MODEL:-kimi-k2-turbo-preview}"
-                local kimi_small="${KIMI_SMALL_FAST_MODEL:-kimi-k2-turbo-preview}"
-                echo "export ANTHROPIC_MODEL='${kimi_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_small}'"
+                echo -e "${RED}❌ Please configure KIMI_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
             fi
             ;;
         "kimi-cn")
@@ -1401,23 +1341,13 @@ emit_env_exports() {
                 echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
                 echo "if [ -z \"\${KIMI_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${PPINFRA_API_KEY}\""
-                local kimi_cn_model="${KIMI_CN_MODEL:-kimi-k2-thinking}"
-                local kimi_cn_small="${KIMI_CN_SMALL_FAST_MODEL:-kimi-k2-thinking}"
+                local kimi_cn_model="${KIMI_CN_MODEL:-moonshotai/kimi-k2-thinking}"
+                local kimi_cn_small="${KIMI_CN_SMALL_FAST_MODEL:-moonshotai/kimi-k2-thinking}"
                 echo "export ANTHROPIC_MODEL='${kimi_cn_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_cn_small}'"
             else
-                # 默认体验密钥
-                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local kimi_cn_model="${KIMI_CN_MODEL:-kimi-k2-thinking}"
-                local kimi_cn_small="${KIMI_CN_SMALL_FAST_MODEL:-kimi-k2-thinking}"
-                echo "export ANTHROPIC_MODEL='${kimi_cn_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${kimi_cn_small}'"
+                echo -e "${RED}❌ Please configure KIMI_CN_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
             fi
             ;;
         "qwen")
@@ -1446,18 +1376,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${qwen_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
             else
-                # 默认体验密钥
-                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local qwen_model="${QWEN_MODEL:-qwen3-next-80b-a3b-thinking}"
-                local qwen_small="${QWEN_SMALL_FAST_MODEL:-qwen3-next-80b-a3b-thinking}"
-                echo "export ANTHROPIC_MODEL='${qwen_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${qwen_small}'"
+                echo -e "${RED}❌ Please configure QWEN_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
             fi
             ;;
         "glm"|"glm4"|"glm4.6")
@@ -1486,18 +1406,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${glm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${glm_small}'"
             else
-                # 默认体验密钥
-                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local glm_model="${GLM_MODEL:-zai-org/glm-4.6}"
-                local glm_small="${GLM_SMALL_FAST_MODEL:-zai-org/glm-4.6}"
-                echo "export ANTHROPIC_MODEL='${glm_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${glm_small}'"
+                echo -e "${RED}❌ Please configure GLM_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
             fi
             ;;
         "claude"|"sonnet"|"s")
@@ -1579,18 +1489,8 @@ emit_env_exports() {
                 echo "export ANTHROPIC_MODEL='${mm_model}'"
                 echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
             else
-                # 默认体验密钥
-                local hidden_key="sk_BDdvx2bkOSQsUOZ-fKLCCooUlWf5-fgp1AtTnCPm1OI"
-                echo "$prelude"
-                echo "export API_TIMEOUT_MS='600000'"
-                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://api.ppinfra.com/anthropic'"
-                echo "export ANTHROPIC_AUTH_TOKEN='${hidden_key}'"
-                local mm_model="${MINIMAX_MODEL:-minimax/minimax-m2}"
-                local mm_small="${MINIMAX_SMALL_FAST_MODEL:-minimax/minimax-m2}"
-                echo "export ANTHROPIC_MODEL='${mm_model}'"
-                echo "export ANTHROPIC_SMALL_FAST_MODEL='${mm_small}'"
+                echo -e "${RED}❌ Please configure MINIMAX_API_KEY or PPINFRA_API_KEY${NC}" >&2
+                return 1
             fi
             ;;
         "kat")
