@@ -131,6 +131,9 @@ LONGCAT_API_KEY=your-longcat-api-key
 # MiniMax M2
 MINIMAX_API_KEY=your-minimax-api-key
 
+# 豆包 Seed-Code (字节跳动)
+ARK_API_KEY=your-ark-api-key
+
 # Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
 
@@ -161,6 +164,8 @@ LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 MINIMAX_MODEL=MiniMax-M2
 MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
+SEED_MODEL=doubao-seed-code-preview-latest
+SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
 
 EOF
         echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -248,6 +253,9 @@ LONGCAT_API_KEY=your-longcat-api-key
 # MiniMax M2
 MINIMAX_API_KEY=your-minimax-api-key
 
+# 豆包 Seed-Code (字节跳动)
+ARK_API_KEY=your-ark-api-key
+
 # Qwen（阿里云 DashScope）
 QWEN_API_KEY=your-qwen-api-key
 
@@ -278,6 +286,8 @@ LONGCAT_MODEL=LongCat-Flash-Thinking
 LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat
 MINIMAX_MODEL=MiniMax-M2
 MINIMAX_SMALL_FAST_MODEL=MiniMax-M2
+SEED_MODEL=doubao-seed-code-preview-latest
+SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest
 
 EOF
     echo -e "${YELLOW}⚠️  $(t 'config_created'): $CONFIG_FILE${NC}" >&2
@@ -950,6 +960,33 @@ switch_to_qwen() {
     echo "   SMALL_MODEL: $ANTHROPIC_SMALL_FAST_MODEL"
 }
 
+# 切换到豆包 Seed-Code (Doubao)
+switch_to_seed() {
+    echo -e "${YELLOW}🔄 $(t 'switching_to') 豆包 Seed-Code $(t 'model')...${NC}"
+    clean_env
+    if is_effectively_set "$ARK_API_KEY"; then
+        # 官方豆包 Seed-Code
+        export ANTHROPIC_BASE_URL="https://ark.cn-beijing.volces.com/api/coding"
+        export ANTHROPIC_API_URL="https://ark.cn-beijing.volces.com/api/coding"
+        export ANTHROPIC_AUTH_TOKEN="$ARK_API_KEY"
+        export ANTHROPIC_API_KEY="$ARK_API_KEY"
+        export API_TIMEOUT_MS="3000000"
+        export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC="1"
+        # 豆包 Seed-Code 模型
+        local seed_model="${SEED_MODEL:-doubao-seed-code-preview-latest}"
+        local seed_small="${SEED_SMALL_FAST_MODEL:-doubao-seed-code-preview-latest}"
+        export ANTHROPIC_MODEL="$seed_model"
+        export ANTHROPIC_SMALL_FAST_MODEL="$seed_small"
+        echo -e "${GREEN}✅ $(t 'switched_to') Seed-Code（$(t 'official')）${NC}"
+    else
+        echo -e "${RED}❌ Please configure ARK_API_KEY${NC}"
+        return 1
+    fi
+    echo "   BASE_URL: $ANTHROPIC_BASE_URL"
+    echo "   MODEL: $ANTHROPIC_MODEL"
+    echo "   TIMEOUT: $API_TIMEOUT_MS"
+}
+
 # 切换到StreamLake AI (KAT)
 switch_to_kat() {
     echo -e "${YELLOW}🔄 $(t 'switching_to') StreamLake AI (KAT) $(t 'model')...${NC}"
@@ -1110,7 +1147,7 @@ switch_to_ppinfra() {
 
 # 显示帮助信息
 show_help() {
-    echo -e "${BLUE}🔧 $(t 'switching_info') v2.2.0${NC}"
+    echo -e "${BLUE}🔧 $(t 'switching_info') v2.3.0${NC}"
     echo ""
     echo -e "${YELLOW}$(t 'usage'):${NC} $(basename "$0") [options]"
     echo ""
@@ -1118,6 +1155,7 @@ show_help() {
     echo "  deepseek, ds       - env deepseek"
     echo "  kimi, kimi2        - env kimi for coding"
     echo "  kimi-cn            - env kimi cn (国内版本)"
+    echo "  seed, doubao       - env 豆包 Seed-Code"
     echo "  kat                - env kat"
     echo "  longcat, lc        - env longcat"
     echo "  minimax, mm        - env minimax"
@@ -1146,6 +1184,7 @@ show_help() {
     echo ""
     echo -e "${YELLOW}$(t 'examples'):${NC}"
     echo "  eval \"\$(ccm deepseek)\"                   # Apply in current shell (recommended)"
+    echo "  eval \"\$(ccm seed)\"                     # Switch to 豆包 Seed-Code with ARK_API_KEY"
     echo "  $(basename "$0") status                      # Check current status (masked)"
     echo "  $(basename "$0") save-account work           # Save current account as 'work'"
     echo "  $(basename "$0") opus:personal               # Switch to 'personal' account with Opus"
@@ -1155,6 +1194,7 @@ show_help() {
     echo "  🌕 KIMI CN              - 官方：kimi-k2-thinking (api.moonshot.cn/anthropic)"
     echo "  🤖 Deepseek            - 官方：deepseek-chat ｜ 备用：deepseek/deepseek-v3.1 (PPINFRA)"
     echo "  🌊 StreamLake (KAT)    - 官方：KAT-Coder"
+    echo "  🌰 豆包 Seed-Code      - 官方：doubao-seed-code-preview-latest (火山引擎方舟)"
     echo "  🐱 LongCat             - 官方：LongCat-Flash-Thinking / LongCat-Flash-Chat"
     echo "  🎯 MiniMax M2          - 官方：MiniMax-M2 ｜ 备用：MiniMax-M2 (PPINFRA)"
     echo "  🐪 Qwen                - 官方：qwen3-max (阿里云) ｜ 备用：qwen3-next-80b-a3b-thinking (PPINFRA)"
@@ -1180,6 +1220,8 @@ ensure_model_override_defaults() {
         "LONGCAT_SMALL_FAST_MODEL=LongCat-Flash-Chat"
         "MINIMAX_MODEL=MiniMax-M2"
         "MINIMAX_SMALL_FAST_MODEL=MiniMax-M2"
+        "SEED_MODEL=doubao-seed-code-preview-latest"
+        "SEED_SMALL_FAST_MODEL=doubao-seed-code-preview-latest"
         "QWEN_MODEL=qwen3-max"
         "QWEN_SMALL_FAST_MODEL=qwen3-next-80b-a3b-instruct"
         "GLM_MODEL=glm-4.6"
@@ -1493,6 +1535,24 @@ emit_env_exports() {
                 return 1
             fi
             ;;
+        "seed"|"doubao")
+            if is_effectively_set "$ARK_API_KEY"; then
+                echo "$prelude"
+                echo "export API_TIMEOUT_MS='3000000'"
+                echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
+                echo "export ANTHROPIC_BASE_URL='https://ark.cn-beijing.volces.com/api/coding'"
+                echo "export ANTHROPIC_API_URL='https://ark.cn-beijing.volces.com/api/coding'"
+                echo "if [ -z \"\${ARK_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
+                echo "export ANTHROPIC_AUTH_TOKEN=\"\${ARK_API_KEY}\""
+                local seed_model="${SEED_MODEL:-doubao-seed-code-preview-latest}"
+                local seed_small="${SEED_SMALL_FAST_MODEL:-doubao-seed-code-preview-latest}"
+                echo "export ANTHROPIC_MODEL='${seed_model}'"
+                echo "export ANTHROPIC_SMALL_FAST_MODEL='${seed_small}'"
+            else
+                echo -e "${RED}❌ Please configure ARK_API_KEY${NC}" >&2
+                return 1
+            fi
+            ;;
         "kat")
             if ! is_effectively_set "$KAT_API_KEY"; then
                 # 兜底：直接 source 配置文件一次
@@ -1604,6 +1664,9 @@ main() {
             ;;
         "minimax"|"mm")
             emit_env_exports minimax
+            ;;
+        "seed"|"doubao")
+            emit_env_exports seed
             ;;
         "glm"|"glm4"|"glm4.6")
             emit_env_exports glm

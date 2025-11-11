@@ -47,6 +47,7 @@ ccc deepseek     # 启动 Claude Code with DeepSeek
 | 🌙 **KIMI for Coding** | ✅ kimi-for-coding | ✅ kimi-k2-turbo-preview | Kimi官方编程专用版本 |
 | 🌕 **KIMI CN** | ✅ kimi-k2-thinking | ✅ kimi-k2-thinking | Kimi国内版本 |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | 高性价比推理 |
+| 🌰 **豆包 Seed-Code** | ✅ doubao-seed-code-preview-latest | ❌ 仅官方 | 火山引擎，代码优化 |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ 仅官方 | 快速对话 |
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | 代码和推理 |
 | 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ 仅官方 | StreamLake AI |

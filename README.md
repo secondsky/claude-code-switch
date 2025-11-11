@@ -47,6 +47,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🌙 **KIMI for Coding** | ✅ kimi-for-coding | ✅ kimi-k2-turbo-preview | Kimi official coding version |
 | 🌕 **KIMI CN** | ✅ kimi-k2-thinking | ✅ kimi-k2-thinking | Kimi China domestic version |
 | 🤖 **Deepseek** | ✅ deepseek-chat | ✅ deepseek/deepseek-v3.2-exp | Cost-effective reasoning |
+| 🌰 **Doubao Seed-Code** | ✅ doubao-seed-code-preview-latest | ❌ Official only | Volcano Engine, code-optimized |
 | 🐱 **LongCat** | ✅ LongCat-Flash-Chat | ❌ Official only | High-speed chat |
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | Code & reasoning |
 | 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ Official only | StreamLake AI |
@@ -306,6 +307,7 @@ ccc kimi --dangerously-skip-permissions # Pass options to Claude Code
 ccm kimi          # Switch to KIMI for Coding (official coding version)
 ccm kimi-cn       # Switch to KIMI CN (China domestic version)
 ccm deepseek      # Switch to Deepseek
+ccm seed          # Switch to Doubao Seed-Code
 ccm minimax       # Switch to MiniMax M2
 ccm qwen          # Switch to Qwen
 ccm kat           # Switch to StreamLake (KAT)
@@ -325,6 +327,7 @@ ccm pp qwen       # Direct switch to PPINFRA Qwen
 
 # Launch Claude Code
 ccc deepseek      # Switch to DeepSeek and launch
+ccc seed          # Switch to Seed-Code and launch
 ccc pp glm        # Switch to PPINFRA GLM and launch
 ccc opus          # Switch to Claude Opus and launch
 ccc kat           # Switch to StreamLake (KAT) and launch
@@ -496,6 +499,7 @@ This project is licensed under the [MIT License](LICENSE).
 - [MiniMax](https://www.minimaxi.com) - MiniMax M2 model
 - [Zhipu AI](https://zhipuai.cn) - GLM large model
 - [Qwen](https://qwen.alibaba.com) - Alibaba Tongyi Qianwen
+- [Doubao](https://www.volcengine.com/product/ark) - Doubao Seed-Code
 
 ---
 
