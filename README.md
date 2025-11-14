@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
-[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/foreveryh/claude-code-switch)
+[![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/secondsky/claude-code-switch)
 
 [Documentation](README.md)
 
@@ -14,7 +14,7 @@ Want to try immediately **without any API key**? Start in 3 steps:
 
 ```bash
 # 1. Install
-curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/main/quick-install.sh | bash
 
 # 2. Reload shell
 source ~/.zshrc  # or source ~/.bashrc for bash
@@ -80,7 +80,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 One-command installation from GitHub - no cloning required:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/main/quick-install.sh | bash
 source ~/.zshrc  # reload shell
 ```
 
@@ -96,7 +96,7 @@ source ~/.zshrc  # reload shell
 Clone the repository and install locally:
 
 ```bash
-git clone https://github.com/foreveryh/claude-code-switch.git
+git clone https://github.com/secondsky/claude-code-switch.git
 cd claude-code-switch
 chmod +x install.sh ccm.sh
 ./install.sh
@@ -478,7 +478,7 @@ Issues and Pull Requests are welcome!
 
 ### Development Setup
 ```bash
-git clone https://github.com/foreveryh/claude-code-switch.git
+git clone https://github.com/secondsky/claude-code-switch.git
 cd claude-code-switch
 ```
 
@@ -505,4 +505,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ⭐ If this project helps you, please give it a Star!
 
-📧 Questions or suggestions? Feel free to submit an [Issue](https://github.com/foreveryh/claude-code-switch/issues)
+📧 Questions or suggestions? Feel free to submit an [Issue](https://github.com/secondsky/claude-code-switch/issues)

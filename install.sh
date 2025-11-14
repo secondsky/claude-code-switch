@@ -7,7 +7,7 @@ set -euo pipefail
 # - Idempotent: will replace previous CCM function block if exists
 
 # GitHub repository info
-GITHUB_REPO="foreveryh/claude-code-switch"
+GITHUB_REPO="secondsky/claude-code-switch"
 GITHUB_BRANCH="main"
 GITHUB_RAW="https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}"
 

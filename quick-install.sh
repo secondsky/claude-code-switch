@@ -3,7 +3,7 @@
 # Claude Code Model Switcher - Quick Install Script
 #
 # One-command installation from GitHub:
-#   curl -fsSL https://raw.githubusercontent.com/foreveryh/claude-code-switch/main/quick-install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/main/quick-install.sh | bash
 #
 # Features:
 #   - Download from GitHub automatically
@@ -25,7 +25,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-GITHUB_REPO="${GITHUB_REPO:-foreveryh/claude-code-switch}"
+GITHUB_REPO="${GITHUB_REPO:-secondsky/claude-code-switch}"
 GITHUB_BRANCH="${GITHUB_BRANCH:-main}"
 GITHUB_RAW_URL="https://raw.githubusercontent.com/$GITHUB_REPO/$GITHUB_BRANCH"
 TEMP_DIR=""
@@ -426,7 +426,7 @@ print_usage() {
   cat ~/.ccm_config    # View configuration
   env | grep ANTHROPIC # Check environment variables
 
-For more info: https://github.com/foreveryh/claude-code-switch
+For more info: https://github.com/secondsky/claude-code-switch
 EOF
 }
 
