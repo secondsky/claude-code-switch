@@ -176,7 +176,7 @@ EOF
     # First read language setting
     if [[ -f "$CONFIG_FILE" ]]; then
         local config_lang
-        config_lang=$(grep -E "^[[:space:]]*CCM_LANGUAGE[[:space:]]*=" "$CONFIG_FILE" 2>/dev/null | head -1 | LC_ALL=C cut -d'=' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+        config_lang=$(grep -E "^[[:space:]]*CCM_LANGUAGE[[:space:]]*=" "$CONFIG_FILE" 2>/dev/null | /usr/bin/head -1 | LC_ALL=C cut -d'=' -f2- | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
         if [[ -n "$config_lang" && -z "$CCM_LANGUAGE" ]]; then
             export CCM_LANGUAGE="$config_lang"
             lang_preference="$config_lang"
@@ -414,8 +414,8 @@ switch_to_glm() {
     clean_env
     if is_effectively_set "$GLM_API_KEY"; then
         # Official GLM Anthropic compatible endpoint
-        export ANTHROPIC_BASE_URL="https://open.bigmodel.cn/api/anthropic"
-        export ANTHROPIC_API_URL="https://open.bigmodel.cn/api/anthropic"
+        export ANTHROPIC_BASE_URL="https://api.z.ai/api/anthropic"
+        export ANTHROPIC_API_URL="https://api.z.ai/api/anthropic"
         export ANTHROPIC_AUTH_TOKEN="$GLM_API_KEY"
         export ANTHROPIC_API_KEY="$GLM_API_KEY"
         export ANTHROPIC_MODEL="glm-4.6"
@@ -759,7 +759,7 @@ switch_account() {
     fi
     
     # Extract account info (simple JSON parsing)
-    local account_info=$(echo "$accounts_json" | grep -o "\"$account_name\":[^}]*}" | sed 's/"'$account_name"://' | sed 's/}//')
+    local account_info=$(echo "$accounts_json" | grep -o "\"$account_name\":[^}]*}" | sed "s/\"$account_name\"://" | sed 's/}//')
     
     if [[ -z "$account_info" ]]; then
         echo -e "${RED}❌ Account '$account_name' not found${NC}" >&2
@@ -884,7 +884,7 @@ delete_account() {
     
     # Remove account (simple JSON manipulation)
     local temp_file=$(mktemp)
-    echo "$accounts_json" | sed -E 's/"'"$account_name"":[^,}]*,?//' | sed -E 's/,([^,]*$)/\1/' | sed -E 's/{,/{/' | sed -E 's/,}/}/' > "$temp_file"
+    echo "$accounts_json" | sed -E "s/\"$account_name\":[^,}]*,?//" | sed -E 's/,([^,]*$)/\1/' | sed -E 's/{,/{/' | sed -E 's/,}/}/' > "$temp_file"
     
     # Save back
     if command -v base64 >/dev/null 2>&1; then
@@ -1241,8 +1241,8 @@ emit_env_exports() {
                 echo "$prelude"
                 echo "export API_TIMEOUT_MS='600000'"
                 echo "export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC='1'"
-                echo "export ANTHROPIC_BASE_URL='https://open.bigmodel.cn/api/anthropic'"
-                echo "export ANTHROPIC_API_URL='https://open.bigmodel.cn/api/anthropic'"
+                echo "export ANTHROPIC_BASE_URL='https://api.z.ai/api/anthropic'"
+                echo "export ANTHROPIC_API_URL='https://api.z.ai/api/anthropic'"
                 echo "if [ -z \"\${GLM_API_KEY}\" ] && [ -f \"\$HOME/.ccm_config\" ]; then . \"\$HOME/.ccm_config\" >/dev/null 2>&1; fi"
                 echo "export ANTHROPIC_AUTH_TOKEN=\"\${GLM_API_KEY}\""
                 local glm_model="${GLM_MODEL:-glm-4.6}"

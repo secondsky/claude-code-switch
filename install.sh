@@ -117,6 +117,8 @@ ccc() {
     echo "  ccc woohelps                              # Switch to 'woohelps' account and launch"
     echo "  ccc opus:work                             # Switch to 'work' account and launch Opus"
     echo "  ccc glm --dangerously-skip-permissions    # Launch GLM with options"
+    echo "  ccc deepseek yolo                         # Launch with yolo mode (skip permissions)"
+    echo "  ccc pp glm yolo                           # PPINFRA + yolo mode"
     echo ""
     echo "Available models:"
     echo "  Official: deepseek, glm, kimi, qwen, claude, opus, haiku, longcat"
@@ -140,8 +142,25 @@ ccc() {
     shift
   fi
   
-  # Collect additional Claude Code arguments
-  claude_args=("\$@")
+  # Check for yolo mode and clean up arguments
+  local yolo_mode=false
+  local filtered_args=()
+  
+  for arg in "\$@"; do
+    if [[ "\$arg" == "yolo" ]]; then
+      yolo_mode=true
+    else
+      filtered_args+=("\$arg")
+    fi
+  done
+  
+  # Collect additional Claude Code arguments (without yolo)
+  claude_args=("\${filtered_args[@]}")
+  
+  # If yolo mode is enabled, add the dangerous permissions flag
+  if \$yolo_mode; then
+    claude_args+=("--dangerously-skip-permissions")
+  fi
   
   # Helper: known model keyword
   _is_known_model() {
@@ -179,6 +198,11 @@ ccc() {
   echo "🚀 Launching Claude Code..."
   echo "   Model: \$ANTHROPIC_MODEL"
   echo "   Base URL: \${ANTHROPIC_BASE_URL:-Default (Anthropic)}"
+  if \$yolo_mode; then
+    echo "   Flags: \${claude_args[*]} (yolo mode enabled)"
+  elif [[ \${#claude_args[@]} -gt 0 ]]; then
+    echo "   Flags: \${claude_args[*]}"
+  fi
   echo ""
 
   # Ensure `claude` CLI exists

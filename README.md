@@ -3,6 +3,7 @@
 > A powerful Claude Code model switching tool with support for multiple AI service providers and intelligent fallback mechanisms
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version: v2.3.0](https://img.shields.io/badge/Version-2.3.0-blue.svg)](https://github.com/secondsky/claude-code-switch/releases/tag/v2.3.0)
 [![Bash](https://img.shields.io/badge/Language-Bash-green.svg)](https://www.gnu.org/software/bash/)
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux-blue.svg)](https://github.com/secondsky/claude-code-switch)
 
@@ -15,6 +16,9 @@ Want to try immediately **without any API key**? Start in 3 steps:
 ```bash
 # 1. Install
 curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/main/quick-install.sh | bash
+
+# Or install specific version (replace v2.3.0 with desired version)
+curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/v2.3.0/quick-install.sh | bash
 
 # 2. Reload shell
 source ~/.zshrc  # or source ~/.bashrc for bash
@@ -52,7 +56,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 | 🎯 **MiniMax M2** | ✅ MiniMax-M2 | ✅ minimax/minimax-m2 | Code & reasoning |
 | 🌊 **StreamLake (KAT)** | ✅ KAT-Coder | ❌ Official only | StreamLake AI |
 | 🐪 **Qwen** | ✅ qwen3-max (Alibaba DashScope) | ✅ qwen3-next-80b-a3b-thinking | Alibaba Cloud official |
-| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI |
+| 🇨🇳 **GLM4.6** | ✅ glm-4.6 | ✅ zai-org/glm-4.6 | Zhipu AI (Global) |
 | 🧠 **Claude Sonnet 4.5** | ✅ claude-sonnet-4-5-20250929 | ❌ Official only | Balanced performance |
 | 🚀 **Claude Opus 4.1** | ✅ claude-opus-4-1-20250805 | ❌ Official only | Strongest reasoning |
 | 🔷 **Claude Haiku 4.5** | ✅ claude-haiku-4-5 | ❌ Official only | Fast and efficient |
@@ -62,6 +66,7 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 > Get started with Zhipu AI's official Claude Code integration:
 > - **Registration Link**: https://www.bigmodel.cn/claude-code?ic=5XMIOZPPXB
 > - **Invitation Code**: `5XMIOZPPXB`
+> - **API Endpoint**: `https://api.z.ai/api/anthropic` (Global endpoint, outside China)
 >
 > GLM-4.6 supports official Claude Code integration with zero-configuration experience. No API key needed to get started!
 
@@ -80,7 +85,12 @@ ccc deepseek     # Launch Claude Code with DeepSeek
 One-command installation from GitHub - no cloning required:
 
 ```bash
+# Install latest version (main branch)
 curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/main/quick-install.sh | bash
+
+# Or install specific version (replace v2.3.0 with desired version)
+curl -fsSL https://raw.githubusercontent.com/secondsky/claude-code-switch/v2.3.0/quick-install.sh | bash
+
 source ~/.zshrc  # reload shell
 ```
 
@@ -106,7 +116,7 @@ source ~/.zshrc  # reload shell
 **Without installation** (run from cloned directory):
 ```bash
 ./ccc deepseek                   # Launch with DeepSeek (current process only)
-eval "$(./ccm env deepseek)"    # Set env vars in current shell only
+eval "$(./ccm env deepseek)"    # Set environment variables in current shell only
 ```
 
 ### What Gets Installed?
@@ -289,6 +299,7 @@ CCM_KEYCHAIN_SERVICE="Claude Code" ccm debug-keychain
 ```bash
 ccm deepseek      # Switch to DeepSeek
 ccm glm           # Switch to GLM4.6
+ccm glm yolo      # Switch to GLM with auto-accept permissions
 ccm pp kimi       # Switch to PPINFRA KIMI
 claude            # Then manually launch Claude Code
 ```
@@ -296,6 +307,7 @@ claude            # Then manually launch Claude Code
 **Method 2: `ccc` - One-Command Launch (Recommended)**
 ```bash
 ccc deepseek                            # Switch and launch
+ccc glm yolo                            # Switch and launch with yolo mode
 ccc pp glm                              # Switch to PPINFRA and launch
 ccc kimi --dangerously-skip-permissions # Pass options to Claude Code
 ```
@@ -327,10 +339,18 @@ ccm pp qwen       # Direct switch to PPINFRA Qwen
 
 # Launch Claude Code
 ccc deepseek      # Switch to DeepSeek and launch
+ccc glm yolo      # Switch to GLM and launch with yolo mode
 ccc seed          # Switch to Seed-Code and launch
 ccc pp glm        # Switch to PPINFRA GLM and launch
 ccc opus          # Switch to Claude Opus and launch
 ccc kat           # Switch to StreamLake (KAT) and launch
+
+# Yolo Mode (auto-accept permissions - use with caution!)
+ccc deepseek yolo     # Launch with auto-accept
+ccc pp glm yolo       # PPINFRA + yolo mode
+ccc opus:work yolo   # Account switch + yolo mode
+
+⚠️ **Security Warning**: Yolo mode skips all permission prompts. Only use in trusted environments.
 
 # Utility commands
 ccm status        # View current status (masked)
@@ -383,7 +403,19 @@ ccm status
 claude  # Launch manually
 ```
 
-**Example 3: One-command launch**
+**Example 3: One-command launch with yolo mode**
+```bash
+ccc pp glm yolo
+🔄 Switching to PPINFRA glm...
+✅ Environment configured for: GLM (PPINFRA)
+
+🚀 Launching Claude Code...
+   Model: zai-org/glm-4.6
+   Base URL: https://api.ppinfra.com/anthropic
+   Flags: --dangerously-skip-permissions (yolo mode enabled)
+```
+
+**Example 4: Manual flag passing**
 ```bash
 ccc pp glm --dangerously-skip-permissions
 🔄 Switching to PPINFRA glm...
@@ -392,6 +424,7 @@ ccc pp glm --dangerously-skip-permissions
 🚀 Launching Claude Code...
    Model: zai-org/glm-4.6
    Base URL: https://api.ppinfra.com/anthropic
+   Flags: --dangerously-skip-permissions
 ```
 
 ## 🔧 Advanced Features
